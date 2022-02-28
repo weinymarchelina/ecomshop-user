@@ -267,6 +267,12 @@ const Product = ({ user }) => {
                     return (
                       <Grid
                         item
+                        sx={{
+                          cursor: "pointer",
+                          "&:hover": {
+                            opacity: 0.85,
+                          },
+                        }}
                         xs={12}
                         sm={6}
                         md={4}
