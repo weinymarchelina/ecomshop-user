@@ -17,7 +17,17 @@ const handleFavorite = async (req, res) => {
     const { userId } = session.user;
     const { productId, favorite } = req.body;
 
-    if (!favorite) {
+    if (favorite === "Update") {
+      const user = await User.updateOne(
+        { _id: userId },
+        {
+          favList: productId,
+        }
+      );
+      return res.status(200).json({
+        result: user,
+      });
+    } else if (!favorite) {
       const user = await User.updateOne(
         { _id: userId },
         {

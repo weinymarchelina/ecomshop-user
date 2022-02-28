@@ -60,17 +60,13 @@ const Product = ({ user }) => {
   useEffect(async () => {
     try {
       const res = await axios.get("/api/products/");
-      console.log(res.data);
+      // console.log(res.data);
       const { productData, businessCategory, userFavList } = res.data;
 
       setCategoryList(businessCategory);
 
-      // const activeProducts = productData.filter(
-      //   (product) => product.activeStatus
-      // );
       setProducts(productData);
       setFavItemList(userFavList);
-      // setFavItemList(["lul"]);
     } catch (err) {
       console.log(err.message);
       console.log(err.response?.data);
