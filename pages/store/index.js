@@ -12,16 +12,11 @@ import {
   Select,
   InputLabel,
   MenuItem,
-  Modal,
-  Button,
 } from "@mui/material";
-import AddBoxIcon from "@mui/icons-material/AddBox";
 import axios from "axios";
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import EditIcon from "@mui/icons-material/Edit";
 import { useRouter } from "next/router";
 
 const styleDecide = (product) => {
@@ -29,20 +24,12 @@ const styleDecide = (product) => {
     return {
       backgroundColor: "#ddd",
     };
-  } else if (product.stockQty < product.warningQty) {
-    return {
-      backgroundColor: "#FAE496",
-    };
   }
 };
 
 const textDecide = (product) => {
-  if (!product.activeStatus) {
-    return "Inactive";
-  } else if (product.stockQty === 0) {
+  if (product.stockQty === 0) {
     return "Out of Stock";
-  } else if (product.stockQty < product.warningQty) {
-    return "Low Stock";
   }
 };
 
@@ -53,7 +40,7 @@ const Product = ({ user }) => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [categoryList, setCategoryList] = useState([]);
   const [sortType, setSortType] = useState("Default");
-  const [favItemList, setFavItemList] = useState(["lul"]);
+  const [favItemList, setFavItemList] = useState([]);
   const router = useRouter();
 
   const sortList = [
@@ -77,16 +64,20 @@ const Product = ({ user }) => {
       const { productData, businessCategory, userFavList } = res.data;
 
       setCategoryList(businessCategory);
+
+      // const activeProducts = productData.filter(
+      //   (product) => product.activeStatus
+      // );
       setProducts(productData);
-      //   setFavItemList(userFavList);
-      setFavItemList(["lul"]);
+      setFavItemList(userFavList);
+      // setFavItemList(["lul"]);
     } catch (err) {
       console.log(err.message);
       console.log(err.response?.data);
 
       throw new Error(err.message);
     }
-  }, []);
+  }, [favItemList]);
 
   const categoryProducts = () => {
     if (selectedCategory === "All") return products;
@@ -146,12 +137,7 @@ const Product = ({ user }) => {
               const textB = b.name.toUpperCase();
               return textA < textB ? -1 : textA > textB ? 1 : 0;
             })
-            .sort(
-              (a, b) =>
-                (b.stockQty > b.warningQty) - (a.stockQty > a.warningQty)
-            )
-            .sort((a, b) => (b.stockQty !== 0) - (a.stockQty !== 0))
-            .sort((a, b) => b.activeStatus - a.activeStatus);
+            .sort((a, b) => (b.stockQty !== 0) - (a.stockQty !== 0));
 
           break;
       }
@@ -163,24 +149,31 @@ const Product = ({ user }) => {
   };
   const finalProducts = sortProducts();
 
-  const findItemFav = (product) => {
-    const favProduct = favItemList.filter((item) => {
-      return item === product._id;
-    });
-    if (favProduct.length > 0) return true;
-    else return false;
+  const favoriteStatus = (selectedProduct) => {
+    const getStatus = favItemList.filter(
+      (item) => item === selectedProduct._id
+    );
+    if (getStatus[0]) {
+      return true;
+    } else {
+      return false;
+    }
   };
 
   const handleFavorite = async (e, selectedProduct) => {
     e.stopPropagation();
+    console.log(favItemList);
+
+    const checkResult = favoriteStatus(selectedProduct);
+
     try {
       await axios.post("/api/products/favorite", {
-        selectedProduct,
+        productId: selectedProduct._id,
+        favorite: checkResult,
       });
-
-      window.location.reload();
+      setFavItemList((prevList) => [...prevList, selectedProduct._id]);
     } catch (err) {
-      setError(err.response.data.msg);
+      console.log(err.response.data.msg);
       return;
     }
   };
@@ -308,10 +301,11 @@ const Product = ({ user }) => {
                                 >
                                   <FavoriteIcon
                                     sx={{
-                                      color: `${() =>
-                                        findItemFav(product)
+                                      color: `${
+                                        favoriteStatus(product)
                                           ? "firebrick"
-                                          : "#202020"}`,
+                                          : ""
+                                      }`,
                                       "&:hover": {
                                         color: "#fff",
                                       },
@@ -330,8 +324,7 @@ const Product = ({ user }) => {
                                   zIndex: 1,
                                 }}
                               >
-                                {(!product.activeStatus ||
-                                  product.stockQty < product.warningQty) && (
+                                {
                                   <Typography
                                     variant="overline"
                                     component="p"
@@ -345,13 +338,13 @@ const Product = ({ user }) => {
                                         !product.activeStatus ||
                                         product.stockQty === 0
                                           ? "#eee"
-                                          : "#FAE496"
+                                          : "none"
                                       }`,
                                     }}
                                   >
                                     {textDecide(product)}
                                   </Typography>
-                                )}
+                                }
                               </Box>
                               <img
                                 src={product.image[0]}
@@ -359,10 +352,7 @@ const Product = ({ user }) => {
                                 style={{
                                   height: "calc(10rem + 2vw)",
                                   opacity: `${
-                                    !product.activeStatus ||
-                                    product.stockQty < product.warningQty
-                                      ? 0.7
-                                      : 1
+                                    product.stockQty === 0 ? 0.7 : 1
                                   }`,
                                 }}
                               />

@@ -44,7 +44,7 @@ const Navbar = () => {
   return (
     <AppBar
       className="nav-container"
-      sx={{ px: 2, zIndex: 10 }}
+      sx={{ px: 2, zIndex: 100 }}
       position="static"
       style={{ position: "fixed" }}
     >
