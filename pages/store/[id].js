@@ -25,11 +25,8 @@ import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
-import DeleteIcon from "@mui/icons-material/Delete";
-import InputAdornment from "@mui/material/InputAdornment";
 
-const EditProduct = ({ user }) => {
+const DisplayProduct = ({ user }) => {
   const router = useRouter();
   const { id } = router.query;
 
@@ -76,7 +73,7 @@ const EditProduct = ({ user }) => {
         <CardContent
           className="f-col"
           sx={{
-            px: "calc(1rem + 2.5vw)",
+            px: 1,
             width: "100%",
           }}
         >
@@ -93,37 +90,130 @@ const EditProduct = ({ user }) => {
               Product Information
             </Typography>
             {product && (
-              <Box className="f-row" sx={{ gap: 5 }}>
-                <Box sx={{ flex: 1 }}>
-                  <img src={product.image[0]} />
-                </Box>
-                <Box sx={{ flex: 1 }}>
-                  <Box sx={{ flex: 1 }}>
-                    <Typography>{product.name}</Typography>
-                    <Typography>
-                      {formatter.format(product.price[0].price)}
-                    </Typography>
-                    <Typography>{product.category?.name}</Typography>
-                  </Box>
-                  <Box sx={{ flex: 1 }}>
-                    <TextField
-                      label="Quantity"
-                      type="number"
-                      value={quantity}
-                      onChange={(e) => setQuantity(e.target.value)}
-                      variant="standard"
-                      required
+              <Grid
+                container
+                className={matches ? "f-column" : "f-row"}
+                sx={{
+                  gap: 5,
+                  my: 7,
+                  minHeight: `${matches ? "auto" : "calc(17.5rem + 5vw)"}`,
+                }}
+              >
+                <Grid
+                  item
+                  xs={12}
+                  md={4}
+                  // className="f-col"
+
+                  sx={{
+                    // alignItems: "stretch",
+
+                    flex: 1,
+                    // height: `${matches ? "auto" : "calc(15rem + 5vw)"}`,
+                    // width: `${matches ? "100%" : "calc(20rem + 5vw)"}`,
+                  }}
+                >
+                  <Box>
+                    <img
                       sx={{
-                        my: 2,
-                        width: `${matches ? "100%" : "35%"}`,
+                        height: `${matches ? "auto" : "calc(15rem + 5vw)"}`,
                       }}
+                      style={{ objectFit: "center" }}
+                      src={product.image[0]}
                     />
                   </Box>
+                  <Box className="f-row" style={{ alignItems: "flex-start" }}>
+                    {product.image.map((img) => (
+                      <Box sx={{ flex: 1 }}>
+                        <img style={{ objectFit: "center" }} src={img} />
+                      </Box>
+                    ))}
+                  </Box>
+                </Grid>
+                <Grid item xs={12} md={7} sx={{ flex: 1 }}>
                   <Box sx={{ flex: 1 }}>
+                    <Typography
+                      variant={matches ? "subtitle1" : "text"}
+                      component="p"
+                    >
+                      {product.category?.name}
+                    </Typography>
+                    <Typography variant={matches ? "h6" : "h5"} component="h2">
+                      {product.name}
+                    </Typography>
+                    <Typography variant={matches ? "h6" : "h5"} component="p">
+                      {formatter.format(product.price[0].price)}
+                    </Typography>
+                  </Box>
+                  <Box
+                    className="f-col"
+                    sx={{
+                      flex: 1,
+                      mx: 0,
+                      alignItems: "flex-start",
+                      justifyContent: "flex-start",
+                    }}
+                  >
+                    <Box>
+                      <InputLabel>
+                        <Typography variant={matches ? "text" : "h6"}>
+                          Quantity
+                        </Typography>
+                      </InputLabel>
+                      <Box
+                        className="f-row"
+                        sx={{
+                          flex: 1,
+                          mx: 0,
+                        }}
+                      >
+                        <Button variant="contained" size="small">
+                          <Typography variant="h5" component="p">
+                            {" "}
+                            +{" "}
+                          </Typography>
+                        </Button>
+                        <Input
+                          type="number"
+                          value={quantity}
+                          onChange={(e) => setQuantity(e.target.value)}
+                          required
+                          sx={{
+                            my: 2,
+                            width: `${matches ? "100%" : "calc(5rem + 2vw)"}`,
+                          }}
+                        />
+                        <Button variant="contained" size="small">
+                          <Typography variant="h5" component="p">
+                            {" "}
+                            -{" "}
+                          </Typography>
+                        </Button>
+                      </Box>
+                    </Box>
+                    <Box
+                      className={matches ? "f-column" : "f-row"}
+                      sx={{ width: `${matches ? "100%" : "auto"}` }}
+                    >
+                      <Button
+                        variant="contained"
+                        sx={{ width: `${matches ? "100%" : "auto"}` }}
+                      >
+                        Put in Cart
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        sx={{ width: `${matches ? "100%" : "auto"}` }}
+                      >
+                        Buy Now
+                      </Button>
+                    </Box>
+                  </Box>
+                  <Box sx={{ flex: 1, my: 5 }}>
                     <Typography>{product.desc}</Typography>
                   </Box>
-                </Box>
-              </Box>
+                </Grid>
+              </Grid>
             )}
           </Box>
         </CardContent>
@@ -132,7 +222,7 @@ const EditProduct = ({ user }) => {
   );
 };
 
-export default EditProduct;
+export default DisplayProduct;
 
 export async function getServerSideProps(context) {
   const session = await getSession(context);
