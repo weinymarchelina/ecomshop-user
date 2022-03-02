@@ -28,6 +28,7 @@ const DisplayProduct = ({ user }) => {
   const stacks = useMediaQuery("(max-width:480px)");
   const min = 1;
   const [max, setMax] = useState(0);
+  const [price, setPrice] = useState(0);
 
   const formatter = new Intl.NumberFormat("id", {
     style: "currency",
@@ -42,17 +43,46 @@ const DisplayProduct = ({ user }) => {
       const { productData } = res.data;
       const searched = productData.filter((product) => product._id === id);
 
-      setProduct(searched[0]);
       console.log(searched[0]);
+
+      setProduct(searched[0]);
       setAllProduct(productData);
       setImgPath(productData.image);
       setMax(searched[0].stockQty);
+      setPrice(searched[0].price[0].price);
     } catch (err) {
       console.log(err.response.data.msg);
       console.log(err.response?.data);
       throw new Error(err.message);
     }
   }, []);
+
+  const getPrice = (currentQty) => {
+    const rules = product.price.reduce((a, b) => {
+      return Math.abs(b.minOrder - currentQty) <
+        Math.abs(a.minOrder - currentQty)
+        ? b.minOrder
+        : a.minOrder;
+    });
+
+    const priceCheck = product.price
+      .map((path, i, arr) => {
+        if (path.minOrder === rules) {
+          if (rules <= currentQty) {
+            return path;
+          } else {
+            const prevPath = i - 1;
+            // console.log(arr[prevPath]);
+            return arr[prevPath];
+          }
+        }
+      })
+      .find((obj) => obj);
+
+    // console.log(`You buy ${currentQty} pcs`);
+    // console.log(`Price: ${priceCheck.price}`);
+    return priceCheck;
+  };
 
   return (
     <Container
@@ -102,38 +132,42 @@ const DisplayProduct = ({ user }) => {
                 <Box
                   className="f-col"
                   sx={{
-                    flex: 1,
+                    flex: 2,
+                    width: "100%",
                   }}
                 >
-                  <Box>
-                    <img
-                      style={{
-                        objectFit: "center",
-                        height: `${matches ? "auto" : "calc(15rem + 5vw)"}`,
-                      }}
-                      src={product.image[0]}
-                    />
-                  </Box>
-                  <Box className="f-row" style={{ alignItems: "flex-start" }}>
+                  <img
+                    style={{
+                      objectFit: "center",
+                      width: "100%",
+                      height: `${matches ? "50vw" : "50%"}`,
+                    }}
+                    src={product.image[0]}
+                  />
+                  <Box
+                    className="f-row"
+                    sx={{
+                      alignItems: "flex-start",
+                      width: "100%",
+                      gap: 0.5,
+                      mt: 1,
+                    }}
+                  >
                     {product.image.map((img) => (
                       <Box key={img} sx={{ flex: 1 }}>
                         <img
-                          style={{ objectFit: "center", height: "6rem" }}
+                          style={{
+                            objectFit: "center",
+                            height: `${matches ? "15vw" : "4.5rem"}`,
+                          }}
                           src={img}
                         />
                       </Box>
                     ))}
                   </Box>
                 </Box>
-                <Box sx={{ flex: 2 }}>
+                <Box sx={{ flex: 3 }}>
                   <Box sx={{ flex: 1, mb: 2 }}>
-                    <Typography
-                      variant={matches ? "subtitle1" : "text"}
-                      component="p"
-                      gutterBottom
-                    >
-                      {product.category?.name}
-                    </Typography>
                     <Typography
                       variant={matches ? "h6" : "h5"}
                       component="h2"
@@ -141,9 +175,26 @@ const DisplayProduct = ({ user }) => {
                     >
                       {product.name}
                     </Typography>
-                    <Typography variant={matches ? "h6" : "h5"} component="p">
-                      {formatter.format(product.price[0].price)}
-                    </Typography>
+                    <Box sx={{ display: "flex", alignItems: "flex-end" }}>
+                      <Typography variant={matches ? "h5" : "h4"} component="p">
+                        {formatter.format(price)}
+                      </Typography>
+                      {price !== product.price[0].price && (
+                        <Typography
+                          sx={{
+                            ml: 2,
+
+                            textDecoration: "line-through",
+                          }}
+                          style={{
+                            marginBottom: `${matches ? "0.15rem" : "0.25rem"}`,
+                          }}
+                          component="p"
+                        >
+                          {formatter.format(product.price[0].price)}
+                        </Typography>
+                      )}
+                    </Box>
                   </Box>
                   <Box
                     className="f-col"
@@ -197,11 +248,13 @@ const DisplayProduct = ({ user }) => {
                           <span
                             className="buttonAdd"
                             onClick={() => {
-                              console.log(quantity);
-
                               setQuantity((value) =>
                                 quantity - 1 === 0 ? value : value - 1
                               );
+
+                              if (quantity - 1 >= 1) {
+                                setPrice(getPrice(quantity - 1).price);
+                              }
                             }}
                           >
                             <Typography variant="h5" component="p">
@@ -228,6 +281,10 @@ const DisplayProduct = ({ user }) => {
                               if (value < min) value = min;
 
                               setQuantity(value);
+
+                              if (value >= 1) {
+                                setPrice(getPrice(value).price);
+                              }
                             }}
                             required
                             sx={{
@@ -239,11 +296,13 @@ const DisplayProduct = ({ user }) => {
                           <span
                             className="buttonAdd"
                             onClick={() => {
-                              console.log(quantity);
-
                               setQuantity((value) =>
                                 quantity + 1 > max ? value : value + 1
                               );
+
+                              if (quantity + 1 >= 1) {
+                                setPrice(getPrice(quantity + 1).price);
+                              }
                             }}
                           >
                             <Typography variant="h5" component="p">
@@ -280,25 +339,58 @@ const DisplayProduct = ({ user }) => {
                       </Box>
                     </Box>
                   </Box>
-                  {product.desc && (
-                    <Box
-                      sx={{ flex: 1, my: 5, pt: 2 }}
-                      style={{ borderTop: "1px solid #ddd" }}
-                    >
+
+                  <Box
+                    sx={{ flex: 1, my: 5, pt: 2 }}
+                    style={{ borderTop: "1px solid #ddd" }}
+                  >
+                    <Box sx={{ mb: 2 }}>
                       <FormLabel>
-                        <Typography variant={stacks ? "text" : "h6"}>
-                          Description
-                        </Typography>
+                        <Typography variant="subtitle1">Category</Typography>
                       </FormLabel>
-                      <Typography
-                        sx={{ lineHeight: "135%", my: 1 }}
-                        variant="body1"
-                        component="p"
-                      >
-                        {product.desc}
+                      <Typography sx={{ my: 1 }} variant="body1" component="p">
+                        {product.category.name}
                       </Typography>
                     </Box>
-                  )}
+
+                    {product.price.length > 1 && (
+                      <Box sx={{ mb: 2 }}>
+                        <FormLabel>
+                          <Typography variant="subtitle1">
+                            Price List
+                          </Typography>
+                        </FormLabel>
+                        <Box sx={{ my: 1 }}>
+                          {product.price.map((tag) => (
+                            <Typography
+                              key={tag.minOrder}
+                              sx={{ letterSpacing: "1px" }}
+                            >
+                              {formatter.format(tag.price)} for {tag.minOrder}{" "}
+                              pcs
+                            </Typography>
+                          ))}
+                        </Box>
+                      </Box>
+                    )}
+
+                    {product.desc && (
+                      <Box sx={{ mb: 2 }}>
+                        <FormLabel>
+                          <Typography variant="subtitle1">
+                            Description
+                          </Typography>
+                        </FormLabel>
+                        <Typography
+                          sx={{ lineHeight: "135%", my: 1 }}
+                          variant="body1"
+                          component="p"
+                        >
+                          {product.desc}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
                 </Box>
               </Box>
             )}
