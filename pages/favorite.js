@@ -6,23 +6,11 @@ import {
   Typography,
   IconButton,
   Grid,
-  Paper,
-  TextField,
-  Autocomplete,
-  FormControl,
-  Select,
-  InputLabel,
-  MenuItem,
-  Input,
-  Modal,
   Button,
-  List,
-  ListItem,
-  ListItemButton,
 } from "@mui/material";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { getSession, signOut } from "next-auth/react";
+import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
@@ -99,7 +87,7 @@ const FavoriteItemList = ({ user }) => {
       });
 
       console.log(res);
-      router.push("/products");
+      router.push("/store");
     } catch (err) {
       console.log(err.message);
       console.log(err.response?.data);
@@ -134,38 +122,24 @@ const FavoriteItemList = ({ user }) => {
               >
                 Favorite List
               </Typography>
+              <Box
+                sx={{
+                  width: `${matches ? "100%" : "auto"}`,
+                }}
+                className={matches ? "f-col" : "f-row"}
+              >
+                <Button
+                  sx={{
+                    width: `${matches ? "100%" : "auto"}`,
+                  }}
+                  variant="contained"
+                  onClick={handleSave}
+                >
+                  Save
+                </Button>
+              </Box>
             </Box>
 
-            {/* <List>
-              {products.map((product) => (
-                <ListItem
-                  key={product._id}
-                  onClick={() => router.push(`/store/${product._id}`)}
-                  sx={{ py: 0, px: 2 }}
-                  style={{
-                    border: "1px solid #ddd",
-                    borderRadius: ".5vw",
-                    display: "flex",
-                  }}
-                >
-                    
-                  <Typography
-                    sx={{
-                      flex: 19,
-                      letterSpacing: `${matches ? "0" : "1px"}`,
-                    }}
-                  >
-                    {product.name}
-                  </Typography>
-                  <ListItemButton
-                    sx={{ px: 1, flex: 1 }}
-                    onClick={() => unfavorite(product)}
-                  >
-                    <RemoveCircleIcon color="primary" />
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List> */}
             <Grid container spacing={3} sx={{ my: 1 }}>
               {products.map((product) => {
                 return (
@@ -280,36 +254,6 @@ const FavoriteItemList = ({ user }) => {
                 );
               })}
             </Grid>
-            <Box
-              sx={{
-                mt: 3,
-                alignSelf: "flex-end",
-                width: `${matches ? "100%" : "auto"}`,
-              }}
-              className={matches ? "f-col" : "f-row"}
-            >
-              <Button
-                sx={{
-                  alignSelf: "flex-end",
-                  width: `${matches ? "100%" : "auto"}`,
-                }}
-                variant="contained"
-                onClick={handleSave}
-              >
-                Save
-              </Button>
-              <Button
-                sx={{
-                  alignSelf: "flex-end",
-                  width: `${matches ? "100%" : "auto"}`,
-                }}
-                style={{ marginLeft: `${matches ? "0" : ".5rem"}` }}
-                variant="outlined"
-                onClick={() => router.push("/products")}
-              >
-                Cancel
-              </Button>
-            </Box>
           </CardContent>
         </Card>
       )}

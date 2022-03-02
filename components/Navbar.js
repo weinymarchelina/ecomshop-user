@@ -81,38 +81,6 @@ const Navbar = () => {
                 >
                   <NotificationsIcon />
                 </IconButton>
-                {/* <IconButton
-                  size="large"
-                  onClick={handleOpenNavMenu}
-                  color="inherit"
-                >
-                  <MenuIcon />
-                </IconButton>
-
-                <Menu
-                  id="menu-appbar"
-                  anchorEl={anchorElNav}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "left",
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "left",
-                  }}
-                  open={Boolean(anchorElNav)}
-                  onClose={handleCloseNavMenu}
-                  sx={{
-                    display: { xs: "block", md: "none" },
-                  }}
-                >
-                  {links.map((link) => (
-                    <MenuItem key={link} onClick={handleCloseNavMenu}>
-                      <Link href={`/${link.toLowerCase()}`}>{link}</Link>
-                    </MenuItem>
-                  ))}
-                </Menu> */}
               </Box>
             )}
           </Box>
@@ -120,8 +88,14 @@ const Navbar = () => {
           {session && (
             <Box sx={{ flexGrow: 0, display: { xs: "none", md: "flex" } }}>
               {links.map((link) => (
-                <Typography sx={{ paddingLeft: 2 }} key={link}>
-                  <Link href={`/${link.toLowerCase()}`}>{link}</Link>
+                <Typography
+                  variant="text"
+                  sx={{ paddingLeft: 2, letterSpacing: "1px" }}
+                  key={link}
+                >
+                  <Link href={`/${link.toLowerCase()}`}>
+                    {link.toUpperCase()}
+                  </Link>
                 </Typography>
               ))}
             </Box>
@@ -129,9 +103,6 @@ const Navbar = () => {
 
           {!session && (
             <>
-              {/* <Button variant="outlined" color="secondary">
-                <Link href="/">Sign Up</Link>
-              </Button> */}
               <Button
                 onClick={() => {
                   signIn(null, {
