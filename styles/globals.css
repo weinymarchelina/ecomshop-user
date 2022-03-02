@@ -120,3 +120,19 @@ img {
 @media only screen and (max-width: 720px) {
   /**/
 }
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.buttonAdd {
+  padding: 0.25rem 1rem;
+  cursor: pointer;
+  border-radius: "5px";
+}
+
+.buttonAdd:hover {
+  background-color: rgba(245, 245, 245, 0.76);
+}
