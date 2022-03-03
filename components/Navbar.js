@@ -69,7 +69,7 @@ const Navbar = () => {
               <Box>
                 <IconButton
                   size="large"
-                  onClick={() => router.push("/store")}
+                  onClick={() => router.push("/cart")}
                   color="inherit"
                 >
                   <ShoppingCartIcon />

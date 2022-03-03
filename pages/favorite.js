@@ -122,19 +122,8 @@ const FavoriteItemList = ({ user }) => {
               >
                 Favorite List
               </Typography>
-              <Box
-                sx={{
-                  width: `${matches ? "100%" : "auto"}`,
-                }}
-                className={matches ? "f-col" : "f-row"}
-              >
-                <Button
-                  sx={{
-                    width: `${matches ? "100%" : "auto"}`,
-                  }}
-                  variant="contained"
-                  onClick={handleSave}
-                >
+              <Box sx={{}} className={matches ? "f-col" : "f-row"}>
+                <Button sx={{}} variant="contained" onClick={handleSave}>
                   Save
                 </Button>
               </Box>
@@ -154,6 +143,7 @@ const FavoriteItemList = ({ user }) => {
                     xs={12}
                     sm={6}
                     md={4}
+                    lg={3}
                     key={product._id}
                     onClick={() => router.push(`/store/${product._id}`)}
                   >
@@ -225,11 +215,19 @@ const FavoriteItemList = ({ user }) => {
                           />
                         </Box>
                         <Box sx={{ my: 2, px: 1 }}>
-                          <Typography variant="h6" component="h2">
+                          <Typography
+                            sx={{
+                              lineHeight: "135%",
+                              mb: 1,
+                              letterSpacing: "0.5px",
+                            }}
+                            variant={matches ? "body1" : "h6"}
+                            component="h2"
+                          >
                             {product.name}
                           </Typography>
                           <Typography
-                            variant="h6"
+                            variant={matches ? "body1" : "h6"}
                             component="p"
                             fontWeight={"bold"}
                           >

@@ -1,7 +1,6 @@
 import dbConnect from "../../../db/database";
 import User from "../../../models/user";
-import Business from "../../../models/business";
-import Product from "../../../models/product";
+
 import { getSession } from "next-auth/react";
 
 dbConnect();
