@@ -129,12 +129,7 @@ const DisplayProduct = ({ user }) => {
         added: false,
         priceList: product.price,
       });
-      // console.log({
-      //   price,
-      //   quantity,
-      //   productId: product._id,
-      //   add: "Edit",
-      // });
+
       const { basket } = result.data.result;
       console.log(basket);
       const productCartQty = basket.filter((item) => item.productId === id);
