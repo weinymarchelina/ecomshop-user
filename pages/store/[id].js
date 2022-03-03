@@ -26,7 +26,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 const DisplayProduct = ({ user }) => {
   const router = useRouter();
   const { id } = router.query;
-  console.log(id);
+  // console.log(id);
 
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
@@ -38,6 +38,8 @@ const DisplayProduct = ({ user }) => {
   const min = 1;
   const [max, setMax] = useState(0);
   const [price, setPrice] = useState(0);
+  const [cartQty, setCartQty] = useState(0);
+  const [notif, setNotif] = useState(null);
 
   const formatter = new Intl.NumberFormat("id", {
     style: "currency",
@@ -58,15 +60,19 @@ const DisplayProduct = ({ user }) => {
     mr: 1,
   };
 
-  const getPrice = (currentQty) => {
-    const rules = product.price.reduce((a, b) => {
+  const getPrice = (currentQty, selectedProduct = product) => {
+    if (selectedProduct.price.length === 1) {
+      return selectedProduct.price[0];
+    }
+
+    const rules = selectedProduct.price.reduce((a, b) => {
       return Math.abs(b.minOrder - currentQty) <
         Math.abs(a.minOrder - currentQty)
         ? b.minOrder
         : a.minOrder;
     });
 
-    const priceCheck = product.price
+    const priceCheck = selectedProduct.price
       .map((path, i, arr) => {
         if (path.minOrder === rules) {
           if (rules <= currentQty) {
@@ -106,7 +112,7 @@ const DisplayProduct = ({ user }) => {
     while (counter < 2) {
       const nextProduct =
         allItems[getIndex(allItems, counter, selectedProduct)];
-      console.log(nextProduct);
+      // console.log(nextProduct);
       arrProducts.push(nextProduct);
       counter++;
     }
@@ -116,20 +122,32 @@ const DisplayProduct = ({ user }) => {
 
   const handleCart = async () => {
     try {
-      // await axios.post("/api/cart/add", {
-      //   price,
-      //   quantity,
-      //   productId: product._id
-      // });
-      console.log({
+      const result = await axios.post("/api/cart/add", {
         price,
         quantity,
         productId: product._id,
+        added: false,
+        priceList: product.price,
       });
-      setPrice(product.price[0].price);
+      // console.log({
+      //   price,
+      //   quantity,
+      //   productId: product._id,
+      //   add: "Edit",
+      // });
+      const { basket } = result.data.result;
+      console.log(basket);
+      const productCartQty = basket.filter((item) => item.productId === id);
+      console.log(productCartQty);
+      setCartQty(productCartQty[0].quantity);
+
+      const expectedQty = 1 + productCartQty[0].quantity;
+      console.log(expectedQty);
+      setPrice(getPrice(expectedQty).price);
       setQuantity(1);
     } catch (err) {
       console.log(err.response.data.msg);
+      console.log(err.response.data);
       return;
     }
   };
@@ -138,18 +156,34 @@ const DisplayProduct = ({ user }) => {
     try {
       const res = await axios.get("/api/products/");
 
-      const { productData } = res.data;
+      const { productData, userBasket } = res.data;
       const searched = productData.filter((product) => product._id === id);
+      const mainProduct = searched[0];
 
-      console.log(searched[0]);
+      console.log(userBasket);
+      const productCartQty = userBasket.filter((item) => item.productId === id);
 
-      setProduct(searched[0]);
-      setMax(searched[0].stockQty);
-      setPrice(searched[0].price[0].price);
+      // let currentCartQty;
+      // if (productCartQty[0]) {
+      //   currentCartQty = productCartQty[0].quantity;
+      // } else {
+      //   currentCartQty = 0;
+      // }
+
+      const currentCartQty = productCartQty[0] ? productCartQty[0].quantity : 0;
+      setCartQty(currentCartQty);
+      const expectedQty = 1 + currentCartQty;
+      // console.log(currentCartQty);
+      // console.log(expectedQty);
+      setPrice(getPrice(expectedQty, mainProduct).price);
+      setMax(mainProduct.stockQty - currentCartQty);
+      // setPrice(mainProduct.price[0].price);
+      setQuantity(1);
+      setProduct(mainProduct);
 
       // const arrProducts = getNextProducts();
       const allActive = productData.filter((product) => product.stockQty !== 0);
-      setNextProducts(getNextProducts(allActive, searched[0]));
+      setNextProducts(getNextProducts(allActive, mainProduct));
     } catch (err) {
       console.log(err.response?.data);
       throw new Error(err.message);
@@ -314,6 +348,7 @@ const DisplayProduct = ({ user }) => {
                             objectFit: "center",
                             width: "100%",
                             height: `${matches ? "50vw" : "100%"}`,
+                            cursor: "pointer",
                           }}
                           src={product.image[imgIndex]}
                         />
@@ -409,6 +444,15 @@ const DisplayProduct = ({ user }) => {
                             </Typography>
                           )}
                         </Box>
+                        {cartQty > 0 && (
+                          <Box>
+                            <Typography variant="subtitle2" sx={{ mt: 1 }}>
+                              You have {cartQty} pcs in your cart. By adding{" "}
+                              {quantity} pcs, you will have {cartQty + quantity}{" "}
+                              pcs of this product.
+                            </Typography>
+                          </Box>
+                        )}
                       </Box>
                       <Box
                         className="f-col"
@@ -429,97 +473,104 @@ const DisplayProduct = ({ user }) => {
                             justifyContent: "flex-start",
                           }}
                         >
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: `${
-                                matches ? "space-between" : "flex-start"
-                              }`,
-                              width: "100%",
-                            }}
-                          >
-                            <InputLabel
-                              sx={{ mr: 7.5 }}
-                              style={{ flex: `${matches ? 5 : "none"}` }}
-                            >
-                              <Typography variant={stacks ? "text" : "h6"}>
-                                Quantity
-                              </Typography>
-                            </InputLabel>
+                          {product.stockQty > 0 && (
                             <Box
-                              className="f-row"
                               sx={{
-                                flex: 1,
-                                mx: 0,
-                                borderRadius: "5px",
-                              }}
-                              style={{
-                                border: "1px solid #ddd",
-                                flex: `${matches ? 1 : "none"}`,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: `${
+                                  matches ? "space-between" : "flex-start"
+                                }`,
+                                width: "100%",
                               }}
                             >
-                              <span
-                                className="buttonAdd f-row"
-                                onClick={() => {
-                                  setQuantity((value) =>
-                                    quantity - 1 === 0 ? value : value - 1
-                                  );
-
-                                  if (quantity - 1 >= 1) {
-                                    setPrice(getPrice(quantity - 1).price);
-                                  }
-                                }}
+                              <InputLabel
+                                sx={{ mr: 7.5 }}
+                                style={{ flex: `${matches ? 5 : "none"}` }}
                               >
-                                <RemoveIcon fontSize="small" />
-                              </span>
-                              <TextField
-                                inputProps={{
-                                  min,
-                                  max,
-                                  style: {
-                                    textAlign: "center",
-                                    padding: "0.55rem 0",
-                                    letterSpacing: "1px",
-                                  },
-                                }}
-                                type="number"
-                                size="small"
-                                value={quantity}
-                                onChange={(e) => {
-                                  let value = parseInt(e.target.value, 10);
-                                  if (value > max) value = max;
-                                  if (value < min) value = min;
-
-                                  setQuantity(value);
-
-                                  if (value >= 1) {
-                                    setPrice(getPrice(value).price);
-                                  }
-                                }}
-                                required
+                                <Typography variant={stacks ? "text" : "h6"}>
+                                  Quantity
+                                </Typography>
+                              </InputLabel>
+                              <Box
+                                className="f-row"
                                 sx={{
+                                  flex: 1,
                                   mx: 0,
-                                  p: 0,
-                                  width: "3.75rem",
+                                  borderRadius: "5px",
                                 }}
-                              />
-                              <span
-                                className="buttonAdd  f-row"
-                                onClick={() => {
-                                  setQuantity((value) =>
-                                    quantity + 1 > max ? value : value + 1
-                                  );
-
-                                  if (quantity + 1 >= 1) {
-                                    setPrice(getPrice(quantity + 1).price);
-                                  }
+                                style={{
+                                  border: "1px solid #ddd",
+                                  flex: `${matches ? 1 : "none"}`,
                                 }}
                               >
-                                <AddIcon fontSize="small" />
-                              </span>
+                                <span
+                                  className="buttonAdd f-row"
+                                  onClick={() => {
+                                    setQuantity((value) =>
+                                      quantity - 1 === 0 ? value : value - 1
+                                    );
+
+                                    if (quantity - 1 >= 1) {
+                                      setPrice(
+                                        getPrice(quantity - 1 + cartQty).price
+                                      );
+                                    }
+                                  }}
+                                >
+                                  <RemoveIcon fontSize="small" />
+                                </span>
+                                <TextField
+                                  inputProps={{
+                                    min,
+                                    max,
+                                    style: {
+                                      textAlign: "center",
+                                      padding: "0.55rem 0",
+                                      letterSpacing: "1px",
+                                    },
+                                  }}
+                                  type="number"
+                                  size="small"
+                                  value={quantity}
+                                  onChange={(e) => {
+                                    let value = parseInt(e.target.value, 10);
+                                    if (value > max) value = max;
+                                    if (value < min) value = min;
+
+                                    setQuantity(value);
+
+                                    if (value >= 1) {
+                                      setPrice(getPrice(value + cartQty).price);
+                                    }
+                                  }}
+                                  required
+                                  sx={{
+                                    mx: 0,
+                                    p: 0,
+                                    width: "3.75rem",
+                                  }}
+                                />
+                                <span
+                                  className="buttonAdd  f-row"
+                                  onClick={() => {
+                                    setQuantity((value) =>
+                                      quantity + 1 > max ? value : value + 1
+                                    );
+
+                                    console.log(cartQty);
+                                    if (quantity + 1 >= 1) {
+                                      setPrice(
+                                        getPrice(quantity + 1 + cartQty).price
+                                      );
+                                    }
+                                  }}
+                                >
+                                  <AddIcon fontSize="small" />
+                                </span>
+                              </Box>
                             </Box>
-                          </Box>
+                          )}
                           <Box
                             className={matches ? "f-column" : "f-row"}
                             sx={{
@@ -527,7 +578,7 @@ const DisplayProduct = ({ user }) => {
                               my: 3,
                             }}
                           >
-                            {product.stockQty !== 0 && (
+                            {product.stockQty > 0 && (
                               <>
                                 <Button
                                   style={{

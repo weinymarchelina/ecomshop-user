@@ -27,6 +27,7 @@ const getProduct = async (req, res) => {
       businessCategory: business.category,
       productData: product.filter((product) => product.activeStatus),
       userFavList: user.favList,
+      userBasket: user.basket,
     });
   } catch (err) {
     return res.status(500).json(err.message);

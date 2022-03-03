@@ -16,6 +16,7 @@ const UserSchema = new mongoose.Schema(
     notification: Array,
     orders: Array,
     basket: Array,
+    contactName: String,
   },
   { timestamps: true }
 );
