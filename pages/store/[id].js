@@ -157,6 +157,7 @@ const DisplayProduct = ({ user }) => {
       ];
       if (typeof window !== "undefined") {
         localStorage.setItem("selected", JSON.stringify(selected));
+        localStorage.setItem("prevpath", "store");
       }
       router.push("/checkout");
     } catch (err) {

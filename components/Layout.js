@@ -86,7 +86,7 @@ const Layout = ({ children }) => {
             <BottomNavigationAction label="Favorite" icon={<FavoriteIcon />} />
 
             <BottomNavigationAction
-              label="Transactions"
+              label="Transaction"
               icon={<ReceiptIcon />}
             />
 

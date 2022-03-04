@@ -35,13 +35,16 @@ const Checkout = ({ user }) => {
   const [products, setProducts] = useState([]);
   const [selected, setSelected] = useState([]);
   const [subtotal, setSubtotal] = useState(formatter.format(0));
+  const [prevPath, setPrevPath] = useState();
   const router = useRouter();
 
   useEffect(async () => {
     // console.log(user);
     const selectedItems = JSON.parse(window.localStorage.selected);
+    const prevPath = window.localStorage.prevpath;
+    setPrevPath(prevPath);
+
     console.log(selectedItems);
-    console.log(router);
 
     try {
       const res = await axios.get("/api/products/");
@@ -57,11 +60,12 @@ const Checkout = ({ user }) => {
       getSelectedTotal(selectedItems);
     } catch (err) {
       console.log(err.message);
+
       throw new Error(err.message);
     }
   }, []);
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
     const subtotal = selected.map((item) => item.price * item.quantity);
     const result = subtotal.reduce((partialSum, a) => partialSum + a, 0);
     //
@@ -77,6 +81,23 @@ const Checkout = ({ user }) => {
       note: note,
     };
     console.log(newOrder);
+    console.log(prevPath);
+
+    try {
+      const res = await axios.post("/api/order/add", {
+        newOrder,
+        prevPath,
+      });
+      console.log(res);
+      if (typeof window !== "undefined") {
+        localStorage.clear();
+      }
+      router.push("/store");
+    } catch (err) {
+      console.log(err.message);
+      console.log(err.response.data);
+      throw new Error(err.message);
+    }
   };
 
   const findCartInfo = (product) => {

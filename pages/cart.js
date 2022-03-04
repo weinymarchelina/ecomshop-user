@@ -154,6 +154,7 @@ const CartItemList = ({ user }) => {
       console.log(selected);
       if (typeof window !== "undefined") {
         localStorage.setItem("selected", JSON.stringify(selected));
+        localStorage.setItem("prevpath", "cart");
       }
       router.push("/checkout");
     } catch (err) {
