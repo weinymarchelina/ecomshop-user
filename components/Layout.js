@@ -26,10 +26,9 @@ const Layout = ({ children }) => {
       setValue(1);
     } else if (router.route.includes("transaction")) {
       setValue(2);
-    } else {
+    } else if (router.route.includes("account")) {
       setValue(3);
     }
-
     // switch (router.route) {
     //   case router.route.includes("favorite"):
     //     setValue(1);

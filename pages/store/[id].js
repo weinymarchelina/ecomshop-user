@@ -39,7 +39,6 @@ const DisplayProduct = ({ user }) => {
   const [max, setMax] = useState(0);
   const [price, setPrice] = useState(0);
   const [cartQty, setCartQty] = useState(0);
-  const [notif, setNotif] = useState(null);
 
   const formatter = new Intl.NumberFormat("id", {
     style: "currency",
@@ -144,6 +143,26 @@ const DisplayProduct = ({ user }) => {
       console.log(err.response.data.msg);
       console.log(err.response.data);
       return;
+    }
+  };
+
+  const handleCheckout = async () => {
+    try {
+      const selected = [
+        {
+          productId: product._id,
+          quantity,
+          price,
+        },
+      ];
+      if (typeof window !== "undefined") {
+        localStorage.setItem("selected", JSON.stringify(selected));
+      }
+      router.push("/checkout");
+    } catch (err) {
+      console.log(err.message);
+      console.log(err.response?.data);
+      throw new Error(err.message);
     }
   };
 
@@ -596,6 +615,7 @@ const DisplayProduct = ({ user }) => {
                                   sx={{ width: `${matches ? "100%" : "auto"}` }}
                                   onClick={() => {
                                     if (!quantity) setQuantity(1);
+                                    handleCheckout();
                                   }}
                                 >
                                   <Typography>Buy Now</Typography>

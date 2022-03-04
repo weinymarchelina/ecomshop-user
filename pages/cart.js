@@ -5,7 +5,6 @@ import {
   Container,
   Typography,
   IconButton,
-  Grid,
   TextField,
   Button,
   Checkbox,
@@ -29,6 +28,7 @@ const CartItemList = ({ user }) => {
   const switchNav = useMediaQuery("(max-width:900px)");
   const matches = useMediaQuery("(max-width:720px)");
   const stacks = useMediaQuery("(max-width:560px)");
+  const [checkAll, setCheckAll] = useState(false);
   const [products, setProducts] = useState([]);
   const [basket, setBasket] = useState([]);
   const [selected, setSelected] = useState([]);
@@ -77,11 +77,6 @@ const CartItemList = ({ user }) => {
     // return formatter.format(result);
   };
 
-  const setAlignment = () => {
-    if (stacks) return "center";
-    else if (switchNav) return "flex-end";
-    else return "space-between";
-  };
   useEffect(async () => {
     try {
       const res = await axios.get("/api/products/");
@@ -115,14 +110,23 @@ const CartItemList = ({ user }) => {
   };
 
   const handleSave = async () => {
+    const noNull = basket.map((item) => {
+      if (!item.quantity) {
+        item.quantity = 1;
+      }
+
+      return item;
+    });
+    setBasket(noNull);
+
     try {
       const res = await axios.post("/api/cart/add", {
-        basket,
+        basket: noNull,
         added: "Update",
       });
 
       console.log(res);
-      //   router.push("/store");
+      router.push("/store");
     } catch (err) {
       console.log(err.message);
       console.log(err.response?.data);
@@ -131,18 +135,32 @@ const CartItemList = ({ user }) => {
   };
 
   const handleCheckout = async () => {
-    // try {
-    //   const res = await axios.post("/api/cart/add", {
-    //     basket,
-    //     added: "Update",
-    //   });
-    //   console.log(res);
-    //   //   router.push("/store");
-    // } catch (err) {
-    //   console.log(err.message);
-    //   console.log(err.response?.data);
-    //   throw new Error(err.message);
-    // }
+    const noNull = basket.map((item) => {
+      if (!item.quantity) {
+        item.quantity = 1;
+      }
+
+      return item;
+    });
+    setBasket(noNull);
+
+    try {
+      const res = await axios.post("/api/cart/add", {
+        basket: noNull,
+        added: "Update",
+      });
+
+      console.log(res);
+      console.log(selected);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("selected", JSON.stringify(selected));
+      }
+      router.push("/checkout");
+    } catch (err) {
+      console.log(err.message);
+      console.log(err.response?.data);
+      throw new Error(err.message);
+    }
   };
 
   return (
@@ -150,65 +168,71 @@ const CartItemList = ({ user }) => {
       sx={{
         pt: 12,
         pb: 5,
+        minHeight: "120vh",
       }}
-      maxWidth={matches ? "sm" : "lg"}
+      maxWidth="lg"
     >
       {products && (
         <Box
           sx={{
             position: "fixed",
             zIndex: 10,
-            py: 3,
             display: "block",
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: "#eeeeee90",
+            backgroundColor: "#fff",
             borderTop: "1px solid #ccc",
-            px: 5,
           }}
-          style={{ marginBottom: `${switchNav ? "3.75rem" : "0"}` }}
+          style={{
+            marginBottom: `${switchNav ? "3.5rem" : "0"}`,
+            padding: `${switchNav ? "0.75rem 0" : "1rem 0 "}`,
+          }}
         >
-          <Container sx={{ px: 5 }} maxWidth={matches ? "sm" : "lg"}>
+          <Container
+            style={{ padding: `${stacks ? "0 1rem" : "0 2rem"}` }}
+            maxWidth={matches ? "sm" : "lg"}
+          >
             <Box
-              className={stacks ? "f-col" : "f-space"}
-              sx={{ alignItems: "center" }}
+              className="f-space"
+              sx={{ alignItems: "flex-end" }}
               style={{ margin: `${switchNav ? "0" : "0 2.5rem"}` }}
             >
-              <Box
-                className={stacks ? "f-col" : ""}
-                sx={{ display: "flex", gap: 3 }}
-              >
-                <Box className="f-row">
-                  <Checkbox />
-                  <Typography>Select All</Typography>
-                </Box>
-                <Box className={stacks ? "f-col" : "f-row"}>
-                  <Typography sx={{ mr: 1 }} variant="h6" component="p">
-                    Total :
+              <Box sx={{ display: "flex", gap: 3 }}>
+                <Box className="f-col">
+                  <Typography
+                    sx={{
+                      mr: 1,
+                      textTransform: "uppercase",
+                      fontWeight: "bold",
+                    }}
+                    variant="caption"
+                    component="p"
+                  >
+                    Total
                   </Typography>
-                  <Typography sx={{}} variant="h6" component="p">
+                  <Typography variant={stacks ? "body1" : "h6"} component="p">
                     {subtotal}
                   </Typography>
-                  {selected.length > 0 && (
-                    <Typography sx={{ ml: 2 }}>
-                      {`(${selected.length} ${
-                        selected.length > 1 ? "Products" : "Product"
-                      })`}
-                    </Typography>
-                  )}
                 </Box>
               </Box>
               <Box className="f-row">
-                <Button sx={{ mr: 1 }} variant="outlined" onClick={handleSave}>
+                <Button
+                  sx={{ mr: 0.5 }}
+                  variant="outlined"
+                  onClick={handleSave}
+                  size={stacks ? "small" : "large"}
+                >
                   Save
                 </Button>
                 <Button
-                  sx={{ ml: 1 }}
+                  sx={{ ml: 0.5 }}
                   variant="contained"
                   onClick={handleCheckout}
+                  size={stacks ? "small" : "large"}
+                  disabled={!selected.length > 0}
                 >
-                  Checkout
+                  Checkout {selected.length > 0 ? `( ${selected.length} )` : ""}
                 </Button>
               </Box>
             </Box>
@@ -216,8 +240,8 @@ const CartItemList = ({ user }) => {
         </Box>
       )}
       {products && (
-        <Box className="f-row" variant="outlined" size="small">
-          <Box className="f-col" sx={{ px: 5, width: "100%" }}>
+        <Box className="f-row" variant="outlined">
+          <Box className="f-col" sx={{ width: "100%" }}>
             <Box
               className="f-space"
               sx={{
@@ -236,7 +260,31 @@ const CartItemList = ({ user }) => {
               </Typography>
             </Box>
 
-            <Box sx={{ my: 1, py: 2 }}>
+            <Box sx={{ my: 2 }}>
+              {/* <Card
+                variant="outlined"
+                sx={{ display: "flex", alignItems: "center", px: 2, py: 1 }}
+              >
+                <Checkbox
+                  // checked={checkAll}
+                  sx={{
+                    "& .MuiSvgIcon-root": {
+                      fontSize: `${stacks ? 15 : 30}`,
+                    },
+                  }}
+                  style={{ padding: `${stacks ? 0 : ""}` }}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      // setCheckAll(true);
+                      getSelectedTotal(basket);
+                    } else {
+                      // setCheckAll(false);
+                      getSelectedTotal([]);
+                    }
+                  }}
+                />
+                <Typography sx={{ ml: 1 }}>Select All</Typography>
+              </Card> */}
               {products.map((product) => {
                 return (
                   <Box
@@ -259,25 +307,31 @@ const CartItemList = ({ user }) => {
                     >
                       <CardContent className={switchNav ? "f-col" : "f-space"}>
                         <Box className="f-row">
-                          <Box>
+                          <Box
+                            className="f-row"
+                            sx={{
+                              justifyContent: "flex-start",
+                              alignItems: "flex-start",
+                            }}
+                          >
                             <Checkbox
-                              onClick={(e) => e.stopPropagation()}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
                               onChange={(e) => {
-                                // console.log(e.target.checked);
-
                                 if (e.target.checked) {
-                                  //   console.log("Selected into checkout");
                                   const thisProductObj = findCartInfo(product);
-                                  setSelected((prevObjs) => [
-                                    ...prevObjs,
-                                    thisProductObj,
-                                  ]);
+                                  // setSelected((prevObjs) => [
+                                  //   ...prevObjs,
+                                  //   thisProductObj,
+                                  // ]);
+                                  console.log([...selected, thisProductObj]);
+                                  setSelected([...selected, thisProductObj]);
                                   getSelectedTotal([
                                     ...selected,
                                     thisProductObj,
                                   ]);
                                 } else {
-                                  //   console.log("Deleted from checkout");
                                   const newSelected = selected.filter(
                                     (obj) => obj.productId !== product._id
                                   );
@@ -285,7 +339,12 @@ const CartItemList = ({ user }) => {
                                   getSelectedTotal(newSelected);
                                 }
                               }}
-                              sx={{ "& .MuiSvgIcon-root": { fontSize: 30 } }}
+                              sx={{
+                                "& .MuiSvgIcon-root": {
+                                  fontSize: `${stacks ? 20 : 30}`,
+                                },
+                              }}
+                              style={{ padding: `${stacks ? 0 : ""}` }}
                             />
                           </Box>
                           <Box>
@@ -294,12 +353,12 @@ const CartItemList = ({ user }) => {
                               alt={`${product.name}-img`}
                               style={{
                                 width: `${
-                                  stacks ? "5rem" : "calc(7.5rem + 1vw)"
+                                  stacks ? "3.75rem" : "calc(5rem + 1vw)"
                                 }`,
                                 height: `${
-                                  stacks ? "5rem" : "calc(7.5rem + 1vw)"
+                                  stacks ? "3.75rem" : "calc(5rem + 1vw)"
                                 }`,
-                                margin: "0 1rem",
+                                margin: "0 .5rem",
                                 opacity: `${product.stockQty === 0 ? 0.7 : 1}`,
                               }}
                             />
@@ -308,36 +367,33 @@ const CartItemList = ({ user }) => {
                             sx={{
                               my: 2,
                               px: 1,
-                              width: `${
-                                switchNav ? "100%" : "calc(13.5rem + 15vw)"
-                              }`,
+                              flex: 1,
+                              width: `${matches ? "9rem" : "auto"}`,
                             }}
                           >
                             <Typography
-                              variant={stacks ? "body1" : "h6"}
+                              variant="body1"
                               component="h2"
+                              noWrap
+                              sx={{ width: "100%" }}
                             >
                               {product.name}
                             </Typography>
                             <Box
                               sx={{ display: "flex", alignItems: "flex-end" }}
                             >
-                              <Typography
-                                variant={stacks ? "subtitle1" : "h6"}
-                                component="p"
-                                fontWeight={"bold"}
-                              >
+                              <Typography component="p" fontWeight={"bold"}>
                                 {formatter.format(findCartInfo(product).price)}
                               </Typography>
                               {findCartInfo(product).price !==
                                 product.price[0].price && (
                                 <Typography
                                   sx={{
-                                    ml: 2,
-                                    mb: 0.25,
+                                    ml: 1,
+                                    // mb: 0.25,
                                     textDecoration: "line-through",
                                   }}
-                                  variant={stacks ? "body1" : "caption"}
+                                  variant="caption"
                                   component="p"
                                 >
                                   {formatter.format(product.price[0].price)}
@@ -358,7 +414,9 @@ const CartItemList = ({ user }) => {
                           className={switchNav ? "" : "f-col"}
                           sx={{
                             display: "flex",
-                            justifyContent: setAlignment(),
+                            justifyContent: `${
+                              switchNav ? "flex-end" : "space-between"
+                            }`,
                             alignItems: "flex-end",
                           }}
                         >
@@ -402,15 +460,22 @@ const CartItemList = ({ user }) => {
                               >
                                 <span
                                   className="buttonAdd f-row"
+                                  style={{
+                                    padding: `${
+                                      stacks ? "0.1rem 0.5rem" : "0.25rem 1rem"
+                                    }`,
+                                  }}
                                   onClick={(e) => {
                                     e.stopPropagation();
 
+                                    let newObj;
                                     const updatedBasket = basket.map(
                                       (infoObj) => {
                                         if (infoObj.productId === product._id) {
                                           const { quantity: currentQty } =
                                             infoObj;
-                                          return {
+
+                                          newObj = {
                                             productId: infoObj.productId,
                                             quantity:
                                               currentQty - 1 === 0
@@ -421,12 +486,29 @@ const CartItemList = ({ user }) => {
                                               product
                                             ).price,
                                           };
+                                          return newObj;
                                         }
 
                                         return infoObj;
                                       }
                                     );
                                     setBasket(updatedBasket);
+
+                                    const thisProduct = selected.filter(
+                                      (item) => item.productId === product._id
+                                    );
+
+                                    if (thisProduct[0]) {
+                                      const otherProducts = selected.filter(
+                                        (item) => item.productId !== product._id
+                                      );
+
+                                      setSelected([...otherProducts, newObj]);
+                                      getSelectedTotal([
+                                        ...otherProducts,
+                                        newObj,
+                                      ]);
+                                    }
                                   }}
                                 >
                                   <RemoveIcon fontSize="small" />
@@ -437,7 +519,9 @@ const CartItemList = ({ user }) => {
                                     max,
                                     style: {
                                       textAlign: "center",
-                                      padding: "0.55rem 0",
+                                      padding: `${
+                                        stacks ? "0.25rem 0" : "0.5rem 0"
+                                      }`,
                                       letterSpacing: "1px",
                                     },
                                   }}
@@ -452,10 +536,13 @@ const CartItemList = ({ user }) => {
                                     if (value > max) value = max;
                                     if (value < min) value = min;
 
+                                    if (!value) value = "";
+
+                                    let newObj;
                                     const updatedBasket = basket.map(
                                       (infoObj) => {
                                         if (infoObj.productId === product._id) {
-                                          return {
+                                          newObj = {
                                             productId: infoObj.productId,
                                             quantity: value,
                                             price:
@@ -463,12 +550,31 @@ const CartItemList = ({ user }) => {
                                                 ? getPrice(value, product).price
                                                 : infoObj.price,
                                           };
+                                          return newObj;
                                         }
 
                                         return infoObj;
                                       }
                                     );
                                     setBasket(updatedBasket);
+
+                                    console.log(newObj);
+
+                                    const thisProduct = selected.filter(
+                                      (item) => item.productId === product._id
+                                    );
+
+                                    if (thisProduct[0]) {
+                                      const otherProducts = selected.filter(
+                                        (item) => item.productId !== product._id
+                                      );
+
+                                      setSelected([...otherProducts, newObj]);
+                                      getSelectedTotal([
+                                        ...otherProducts,
+                                        newObj,
+                                      ]);
+                                    }
                                   }}
                                   required
                                   sx={{
@@ -479,16 +585,22 @@ const CartItemList = ({ user }) => {
                                 />
                                 <span
                                   className="buttonAdd  f-row"
+                                  style={{
+                                    padding: `${
+                                      stacks ? "0.1rem 0.5rem" : "0.25rem 1rem"
+                                    }`,
+                                  }}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     const max = product.stockQty;
 
+                                    let newObj;
                                     const updatedBasket = basket.map(
                                       (infoObj) => {
                                         if (infoObj.productId === product._id) {
                                           const { quantity: currentQty } =
                                             infoObj;
-                                          return {
+                                          newObj = {
                                             productId: infoObj.productId,
                                             quantity:
                                               currentQty + 1 > max
@@ -499,12 +611,29 @@ const CartItemList = ({ user }) => {
                                               product
                                             ).price,
                                           };
+                                          return newObj;
                                         }
 
                                         return infoObj;
                                       }
                                     );
                                     setBasket(updatedBasket);
+
+                                    const thisProduct = selected.filter(
+                                      (item) => item.productId === product._id
+                                    );
+
+                                    if (thisProduct[0]) {
+                                      const otherProducts = selected.filter(
+                                        (item) => item.productId !== product._id
+                                      );
+
+                                      setSelected([...otherProducts, newObj]);
+                                      getSelectedTotal([
+                                        ...otherProducts,
+                                        newObj,
+                                      ]);
+                                    }
                                   }}
                                 >
                                   <AddIcon fontSize="small" />

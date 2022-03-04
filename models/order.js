@@ -7,8 +7,10 @@ const OrderSchema = new mongoose.Schema(
     itemList: Array,
     totalPrice: Number,
     paymentMethod: String,
-    customer: String,
+    customerName: String,
+    customerId: String,
     doneStatus: Boolean,
+    note: String,
   },
   { timestamps: true }
 );
