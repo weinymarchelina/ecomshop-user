@@ -148,69 +148,143 @@ const Transactions = ({ user }) => {
                     <Card variant="outlined">
                       <CardContent className="f-col">
                         <Box
-                          // className="f-row"
-                          sx={{ display: "flex", alignItems: "flex-start" }}
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            mx: 1,
+                          }}
                         >
+                          <Typography sx={{ mr: 3 }}>
+                            {order.orderDate.slice(0, 10).replace(/-/g, "/")}
+                          </Typography>
                           <Box>
-                            <img
-                              src={order.firstItem.image[0]}
-                              alt={`${order.firstItem.name}-img`}
-                              style={{
-                                width: `${
-                                  stacks ? "3.75rem" : "calc(5rem + 1vw)"
-                                }`,
-                                height: `${
-                                  stacks ? "3.75rem" : "calc(5rem + 1vw)"
-                                }`,
-                                margin: "0 .5rem",
-                                opacity: `${
-                                  order.firstItem.stockQty === 0 ? 0.7 : 1
+                            <Typography
+                              variant="caption"
+                              component="p"
+                              className="main-title"
+                              sx={{
+                                px: 1,
+                                py: 0.5,
+
+                                borderRadius: "0.35vw",
+                                backgroundColor: `${
+                                  !order.doneStatus ? "#eee" : "green"
                                 }`,
                               }}
-                            />
+                            >
+                              {!order.doneStatus ? "In Process" : "Done"}
+                            </Typography>
                           </Box>
+                        </Box>
+                        <Box className="f-space">
                           <Box
+                            // className="f-row"
                             sx={{
-                              px: 1,
-                              mt: 1,
-                              width: `${matches ? "9rem" : "auto"}`,
+                              display: "flex",
+                              alignItems: "flex-start",
+                              my: 2,
                             }}
                           >
-                            <Typography
-                              variant="body1"
-                              component="h2"
-                              noWrap
-                              sx={{ width: "100%" }}
-                            >
-                              {order.firstItem.name}
-                            </Typography>
+                            <Box>
+                              <img
+                                src={order.firstItem.image[0]}
+                                alt={`${order.firstItem.name}-img`}
+                                style={{
+                                  width: `${
+                                    stacks ? "3.75rem" : "calc(5rem + 1vw)"
+                                  }`,
+                                  height: `${
+                                    stacks ? "3.75rem" : "calc(5rem + 1vw)"
+                                  }`,
+                                  margin: "0 .5rem",
+                                  opacity: `${
+                                    order.firstItem.stockQty === 0 ? 0.7 : 1
+                                  }`,
+                                }}
+                              />
+                            </Box>
                             <Box
                               sx={{
-                                display: "flex-col",
-                                alignItems: "flex-end",
+                                px: 1,
+                                mt: 1,
+                                width: `${stacks ? "14.5rem" : "auto"}`,
                               }}
                             >
-                              <Typography variant="caption" component="p">
-                                {order.itemList[0].quantity} pcs x{" "}
-                                {formatter.format(order.itemList[0].price)}
+                              <Typography
+                                variant="body1"
+                                component="h2"
+                                noWrap
+                                sx={{ width: "100%" }}
+                              >
+                                {order.firstItem.name}
                               </Typography>
-
-                              {order.productQty > 1 && (
+                              <Box
+                                sx={{
+                                  display: "flex-col",
+                                  alignItems: "flex-end",
+                                }}
+                              >
                                 <Typography variant="caption" component="p">
-                                  + {order.productQty - 1} other product
+                                  {order.itemList[0].quantity} pcs x{" "}
+                                  {formatter.format(order.itemList[0].price)}
                                 </Typography>
-                              )}
-                            </Box>
-                            {/* <Typography variant="caption" component="p">
+
+                                {order.productQty > 1 && (
+                                  <Typography
+                                    variant="caption"
+                                    component="p"
+                                    sx={{ mt: 1 }}
+                                  >
+                                    + {order.productQty - 1} other product
+                                  </Typography>
+                                )}
+                              </Box>
+
+                              {/* <Typography variant="caption" component="p">
                               Total:{" "}
                               {formatter.format(
                                 order.itemList[0].price *
                                   order.itemList[0].quantity
                               )}
                             </Typography> */}
+                            </Box>
+                          </Box>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "flex-end",
+                            }}
+                          >
+                            <Box sx={{ mr: 2 }}>
+                              <Typography
+                                sx={{
+                                  textTransform: "uppercase",
+                                }}
+                                variant="caption"
+                                component="p"
+                              >
+                                Total
+                              </Typography>
+                              <Typography variant="p" fontWeight={500}>
+                                {formatter.format(order.totalPrice)}
+                              </Typography>
+                            </Box>
                           </Box>
                         </Box>
-                        <Box></Box>
+
+                        <Box
+                          // className="f-space"
+                          sx={{
+                            mt: 3,
+                            display: "flex",
+                            justifyContent: "flex-end",
+                          }}
+                        >
+                          <Box sx={{ display: "flex", gap: 2 }}>
+                            <Button>View Details</Button>
+                            <Button variant="contained">Buy Again</Button>
+                          </Box>
+                        </Box>
                       </CardContent>
                     </Card>
                   </Box>
