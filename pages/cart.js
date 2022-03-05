@@ -28,7 +28,7 @@ const CartItemList = ({ user }) => {
   const switchNav = useMediaQuery("(max-width:900px)");
   const matches = useMediaQuery("(max-width:720px)");
   const stacks = useMediaQuery("(max-width:560px)");
-  const [checkAll, setCheckAll] = useState(false);
+  // const [checkAll, setCheckAll] = useState(false);
   const [products, setProducts] = useState([]);
   const [basket, setBasket] = useState([]);
   const [selected, setSelected] = useState([]);
@@ -87,8 +87,12 @@ const CartItemList = ({ user }) => {
         return result[0];
       });
 
+      const sortedProducts = basketProducts.sort(
+        (a, b) => (b.stockQty !== 0) - (a.stockQty !== 0)
+      );
+
       setBasket(userBasket);
-      setProducts(basketProducts);
+      setProducts(sortedProducts);
     } catch (err) {
       console.log(err.message);
       throw new Error(err.message);
@@ -302,8 +306,9 @@ const CartItemList = ({ user }) => {
                       variant="outlined"
                       sx={{
                         backgroundColor: `${
-                          product.stockQty === 0 ? "#ddd" : "transparent"
+                          product.stockQty === 0 ? "#eeeee80" : "transparent"
                         }`,
+                        opacity: `${product.stockQty === 0 ? 0.7 : 1}`,
                       }}
                     >
                       <CardContent className={switchNav ? "f-col" : "f-space"}>
@@ -649,7 +654,8 @@ const CartItemList = ({ user }) => {
                                 component="p"
                                 fontWeight="bold"
                                 sx={{
-                                  p: 2,
+                                  py: 2,
+                                  px: 4.5,
                                   mt: 1,
                                   borderRadius: "0.35vw",
                                   backgroundColor: "#eee",

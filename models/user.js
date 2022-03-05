@@ -13,10 +13,13 @@ const UserSchema = new mongoose.Schema(
     },
     phone: Number,
     favList: Array,
-    // notification: Array,
     orders: Array,
     basket: Array,
     contactName: String,
+    totalOrder: Number,
+    totalItem: Number,
+    totalPaid: Number,
+    favProducts: Array,
   },
   { timestamps: true }
 );

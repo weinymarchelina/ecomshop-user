@@ -18,6 +18,10 @@ import { useState, useEffect } from "react";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import moment from "moment";
+
+// const idLocale = require("moment/locale/id");
+// moment.locale("id", idLocale);
 
 const formatter = new Intl.NumberFormat("id", {
   style: "currency",
@@ -49,61 +53,30 @@ const Transactions = ({ user }) => {
 
       console.log(orderData);
 
+      // const sortedOrder = orderData.sort((a, b) => b.createdAt < a.createdAt);
+      // setOrders(sortedOrder);
       setOrders(orderData);
-      setProducts(productData);
+      // setProducts(productData);
     } catch (err) {
       console.log(err.message);
       throw new Error(err.message);
     }
   }, []);
 
-  const handleOrder = async () => {
-    const subtotal = selected.map((item) => item.price * item.quantity);
-    const result = subtotal.reduce((partialSum, a) => partialSum + a, 0);
-    //
-    const newDate = new Date();
-    // const newDate = new Date().toJSON().slice(0, 10).replace(/-/g, "/");
-    const newOrder = {
-      orderDate: newDate,
-      itemList: selected,
-      totalPrice: result,
-      paymentMethod: payment,
-      customerName: user.name,
-      customerId: user.userId,
-      note: note,
-    };
-    console.log(newOrder);
-    console.log(prevPath);
-
+  const handleBuy = async (order) => {
+    console.log(order.itemList);
     try {
-      const res = await axios.post("/api/orders/add", {
-        newOrder,
-        prevPath,
+      const res = await axios.post("/api/order/again", {
+        items: order.itemList,
       });
+
       console.log(res);
-      router.push("/store");
+      router.push("/cart");
     } catch (err) {
       console.log(err.message);
-      console.log(err.response.data);
+      console.log(err.response?.data);
       throw new Error(err.message);
     }
-  };
-
-  const findCartInfo = (product) => {
-    const findInfo = selected.filter((obj) => obj.productId === product._id);
-    return findInfo[0];
-  };
-
-  const getSelectedTotal = (arr = selected) => {
-    const subtotal = arr.map((item) => item.price * item.quantity);
-    const result = subtotal.reduce((partialSum, a) => partialSum + a, 0);
-    setSubtotal(formatter.format(result));
-  };
-
-  const getSelectedQty = (arr = selected) => {
-    const totalQty = arr.map((item) => item.quantity);
-    const result = totalQty.reduce((partialSum, a) => partialSum + a, 0);
-    return result;
   };
 
   return (
@@ -139,49 +112,29 @@ const Transactions = ({ user }) => {
             <Box sx={{ mt: 2 }}>
               {orders.map((order) => {
                 return (
-                  <Box
-                    sx={{
-                      cursor: "pointer",
-                    }}
-                    key={order._id}
-                  >
+                  <Box key={order._id}>
                     <Card variant="outlined">
-                      <CardContent className="f-col">
+                      <CardContent
+                        className="f-col"
+                        sx={{ justifyContent: "center" }}
+                      >
                         <Box
+                          className={stacks ? "f-col" : "f-space"}
                           sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            mx: 1,
+                            cursor: "pointer",
+                            "&:hover": {
+                              opacity: 0.85,
+                            },
                           }}
+                          onClick={() =>
+                            router.push(`/store/${order.firstItem._id}`)
+                          }
                         >
-                          <Typography sx={{ mr: 3 }}>
-                            {order.orderDate.slice(0, 10).replace(/-/g, "/")}
-                          </Typography>
-                          <Box>
-                            <Typography
-                              variant="caption"
-                              component="p"
-                              className="main-title"
-                              sx={{
-                                px: 1,
-                                py: 0.5,
-
-                                borderRadius: "0.35vw",
-                                backgroundColor: `${
-                                  !order.doneStatus ? "#eee" : "green"
-                                }`,
-                              }}
-                            >
-                              {!order.doneStatus ? "In Process" : "Done"}
-                            </Typography>
-                          </Box>
-                        </Box>
-                        <Box className="f-space">
                           <Box
                             // className="f-row"
                             sx={{
                               display: "flex",
-                              alignItems: "flex-start",
+                              alignItems: `${stacks ? "center" : "flex-start"}`,
                               my: 2,
                             }}
                           >
@@ -197,9 +150,9 @@ const Transactions = ({ user }) => {
                                     stacks ? "3.75rem" : "calc(5rem + 1vw)"
                                   }`,
                                   margin: "0 .5rem",
-                                  opacity: `${
-                                    order.firstItem.stockQty === 0 ? 0.7 : 1
-                                  }`,
+                                  // opacity: `${
+                                  //   order.firstItem.stockQty === 0 ? 0.7 : 1
+                                  // }`,
                                 }}
                               />
                             </Box>
@@ -207,9 +160,17 @@ const Transactions = ({ user }) => {
                               sx={{
                                 px: 1,
                                 mt: 1,
-                                width: `${stacks ? "14.5rem" : "auto"}`,
+                                width: `${
+                                  matches ? "calc(37.5vw + 5rem)" : "100%"
+                                }`,
                               }}
                             >
+                              <Typography
+                                sx={{ mr: 3, fontSize: "0.6rem" }}
+                                component="p"
+                              >
+                                {moment(order.createdAt).format("LLL")}
+                              </Typography>
                               <Typography
                                 variant="body1"
                                 component="h2"
@@ -252,9 +213,32 @@ const Transactions = ({ user }) => {
                           <Box
                             sx={{
                               display: "flex",
-                              alignItems: "flex-end",
+                              flexDirection: `${
+                                stacks ? "row-reverse" : "column"
+                              }`,
+                              justifyContent: "space-between",
+                              // alignItems: "flex-end",
                             }}
                           >
+                            <Box sx={{ mt: 2 }}>
+                              <Typography
+                                variant="caption"
+                                component="p"
+                                className="main-title"
+                                textAlign="center"
+                                sx={{
+                                  fontSize: `${stacks ? "0.75rem" : "0.7rem"}`,
+                                  px: 1,
+                                  py: 0.5,
+                                  borderRadius: "0.35vw",
+                                  backgroundColor: `${
+                                    !order.doneStatus ? "#eee" : "green"
+                                  }`,
+                                }}
+                              >
+                                {!order.doneStatus ? "In Process" : "Done"}
+                              </Typography>
+                            </Box>
                             <Box sx={{ mr: 2 }}>
                               <Typography
                                 sx={{
@@ -281,8 +265,21 @@ const Transactions = ({ user }) => {
                           }}
                         >
                           <Box sx={{ display: "flex", gap: 2 }}>
-                            <Button>View Details</Button>
-                            <Button variant="contained">Buy Again</Button>
+                            <Button
+                              size="small"
+                              onClick={() =>
+                                router.push(`/transaction/${order._id}`)
+                              }
+                            >
+                              View Details
+                            </Button>
+                            <Button
+                              size="small"
+                              variant="contained"
+                              onClick={() => handleBuy(order)}
+                            >
+                              Buy Again
+                            </Button>
                           </Box>
                         </Box>
                       </CardContent>

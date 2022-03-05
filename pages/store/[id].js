@@ -178,13 +178,6 @@ const DisplayProduct = ({ user }) => {
       console.log(userBasket);
       const productCartQty = userBasket.filter((item) => item.productId === id);
 
-      // let currentCartQty;
-      // if (productCartQty[0]) {
-      //   currentCartQty = productCartQty[0].quantity;
-      // } else {
-      //   currentCartQty = 0;
-      // }
-
       const currentCartQty = productCartQty[0] ? productCartQty[0].quantity : 0;
       setCartQty(currentCartQty);
       const expectedQty = 1 + currentCartQty;

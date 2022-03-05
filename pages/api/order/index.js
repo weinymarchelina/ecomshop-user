@@ -1,4 +1,6 @@
 import dbConnect from "../../../db/database";
+import User from "../../../models/user";
+import Business from "../../../models/business";
 import Order from "../../../models/order";
 import Product from "../../../models/product";
 import { getSession } from "next-auth/react";
@@ -14,21 +16,16 @@ const getOrder = async (req, res) => {
   try {
     const session = await getSession({ req });
     if (!session) return res.status(400).json({ msg: "Please login first." });
-    const { userId } = session.user;
+    const { orderId } = req.body;
 
-    const order = await Order.find({
-      customerId: userId,
-    }).sort({ _id: -1 });
-
-    const product = await Product.find({
-      businessId,
+    const orderData = await Order.findById(orderId);
+    const productData = await Product.find({
+      businessId: businessId,
     });
 
-    console.log(order);
-
     res.status(200).json({
-      orderData: order,
-      productData: product.filter((product) => product.activeStatus),
+      orderData,
+      productData,
     });
   } catch (err) {
     return res.status(500).json(err.message);

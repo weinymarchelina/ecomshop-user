@@ -75,6 +75,7 @@ const Checkout = ({ user }) => {
       orderDate: newDate,
       itemList: selected,
       totalPrice: result,
+      totalQty: getSelectedTotal(),
       paymentMethod: payment,
       customerName: user.name,
       customerId: user.userId,
@@ -293,7 +294,6 @@ const Checkout = ({ user }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                // justifyContent: `${matches ? "space-between" : "flex-end"}`,
                 px: 2,
                 py: 1,
               }}
@@ -320,13 +320,6 @@ const Checkout = ({ user }) => {
                     outline: "none",
                   }}
                   placeholder="Type your note here"
-                  //   variant="outlined"
-                  //   inputProps={{
-                  //     style: {
-                  //       textAlign: "right",
-                  //     },
-                  //   }}
-                  //   fullWidth
                 />
               </FormControl>
             </Card>
@@ -336,8 +329,6 @@ const Checkout = ({ user }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-
-                // justifyContent: `${matches ? "space-between" : "flex-end"}`,
                 px: 2,
                 py: 1,
               }}
@@ -355,11 +346,6 @@ const Checkout = ({ user }) => {
                   value={payment}
                   onChange={(e) => setPayment(e.target.value)}
                   variant="standard"
-                  //   inputProps={{
-                  //     style: {
-                  //       padding: "1rem",
-                  //     },
-                  //   }}
                 >
                   {paymentList.map((paymentName) => {
                     return (
@@ -376,12 +362,6 @@ const Checkout = ({ user }) => {
                   })}
                 </Select>
               </FormControl>
-              {/* <Typography
-                sx={{ textAlign: "right" }}
-                variant={stacks ? "caption" : "body1"}
-              >
-                Cash On Delivery
-              </Typography> */}
             </Card>
             <Card
               variant="outlined"
@@ -389,7 +369,6 @@ const Checkout = ({ user }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                // justifyContent: `${matches ? "space-between" : "flex-end"}`,
                 px: 2,
                 py: 1,
               }}
