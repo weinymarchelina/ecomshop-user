@@ -65,16 +65,23 @@ const DisplayProduct = ({ user }) => {
     }
 
     const rules = selectedProduct.price.reduce((a, b) => {
+      console.log("Current Qty");
+      console.log(currentQty);
+      console.log(a.minOrder);
+      console.log(b.minOrder);
       return Math.abs(b.minOrder - currentQty) <
         Math.abs(a.minOrder - currentQty)
-        ? b.minOrder
-        : a.minOrder;
+        ? b
+        : a;
     });
+
+    console.log("rules");
+    console.log(rules);
 
     const priceCheck = selectedProduct.price
       .map((path, i, arr) => {
-        if (path.minOrder === rules) {
-          if (rules <= currentQty) {
+        if (path.minOrder === rules.minOrder) {
+          if (rules.minOrder <= currentQty) {
             return path;
           } else {
             const prevPath = i - 1;
@@ -107,8 +114,9 @@ const DisplayProduct = ({ user }) => {
   const getNextProducts = (allItems, selectedProduct) => {
     let counter = 1;
     const arrProducts = [];
+    const currentItemCount = allItems.length > 7 ? 7 : allItems.length;
 
-    while (counter < 2) {
+    while (counter < currentItemCount) {
       const nextProduct =
         allItems[getIndex(allItems, counter, selectedProduct)];
       // console.log(nextProduct);
@@ -130,13 +138,13 @@ const DisplayProduct = ({ user }) => {
       });
 
       const { basket } = result.data.result;
-      console.log(basket);
+      // console.log(basket);
       const productCartQty = basket.filter((item) => item.productId === id);
-      console.log(productCartQty);
+      // console.log(productCartQty);
       setCartQty(productCartQty[0].quantity);
 
       const expectedQty = 1 + productCartQty[0].quantity;
-      console.log(expectedQty);
+      // console.log(expectedQty);
       setPrice(getPrice(expectedQty).price);
       setQuantity(1);
     } catch (err) {
@@ -152,7 +160,7 @@ const DisplayProduct = ({ user }) => {
         {
           productId: product._id,
           quantity,
-          price,
+          price: getPrice(quantity, product).price,
         },
       ];
       if (typeof window !== "undefined") {
@@ -174,8 +182,10 @@ const DisplayProduct = ({ user }) => {
       const { productData, userBasket } = res.data;
       const searched = productData.filter((product) => product._id === id);
       const mainProduct = searched[0];
+      console.log(mainProduct);
+      console.log(mainProduct.price);
 
-      console.log(userBasket);
+      // console.log(userBasket);
       const productCartQty = userBasket.filter((item) => item.productId === id);
 
       const currentCartQty = productCartQty[0] ? productCartQty[0].quantity : 0;
@@ -187,7 +197,13 @@ const DisplayProduct = ({ user }) => {
       setQuantity(1);
       setProduct(mainProduct);
 
-      const allActive = productData.filter((product) => product.stockQty !== 0);
+      const allActive = productData
+        .filter((product) => product.stockQty !== 0)
+        .sort((a, b) => {
+          const textA = a.name.toUpperCase();
+          const textB = b.name.toUpperCase();
+          return textA < textB ? -1 : textA > textB ? 1 : 0;
+        });
       setNextProducts(getNextProducts(allActive, mainProduct));
     } catch (err) {
       console.log(err.response?.data);
@@ -203,11 +219,10 @@ const DisplayProduct = ({ user }) => {
       }}
       maxWidth={matches ? "sm" : "lg"}
     >
-      <Card className="f-row" variant="outlined" size="small" sx={{ p: 3 }}>
-        <CardContent
+      <Box className="f-row" variant="outlined" size="small" sx={{ py: 3 }}>
+        <Box
           className="f-col"
           sx={{
-            px: 1,
             width: "100%",
           }}
         >
@@ -385,8 +400,9 @@ const DisplayProduct = ({ user }) => {
                       </Box>
 
                       <Box
-                        className="f-row"
+                        // className="f-row"
                         sx={{
+                          display: "flex",
                           alignItems: "flex-start",
                           width: "100%",
                           gap: 0.5,
@@ -396,7 +412,11 @@ const DisplayProduct = ({ user }) => {
                         {product.image.map((img, index) => (
                           <Box
                             key={img}
-                            sx={{ flex: 1, cursor: "pointer" }}
+                            sx={{
+                              flex: 1,
+                              cursor: "pointer",
+                              maxWidth: "calc(2rem + 2.5vw)",
+                            }}
                             onClick={() => setImgIndex(index)}
                           >
                             <img
@@ -762,8 +782,8 @@ const DisplayProduct = ({ user }) => {
               </>
             )}
           </Box>
-        </CardContent>
-      </Card>
+        </Box>
+      </Box>
     </Container>
   );
 };

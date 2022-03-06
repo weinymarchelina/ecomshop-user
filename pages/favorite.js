@@ -105,7 +105,7 @@ const FavoriteItemList = ({ user }) => {
     >
       {products && (
         <Box className="f-row" variant="outlined" size="small">
-          <Box className="f-col" sx={{ px: 5, width: "100%" }}>
+          <Box className="f-col" sx={{ pb: 5, width: "100%" }}>
             <Box
               className="f-space"
               sx={{

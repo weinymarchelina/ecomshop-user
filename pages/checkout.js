@@ -36,6 +36,7 @@ const Checkout = ({ user }) => {
   const [selected, setSelected] = useState([]);
   const [subtotal, setSubtotal] = useState(formatter.format(0));
   const [prevPath, setPrevPath] = useState();
+  const [clicked, setClicked] = useState(false);
   const router = useRouter();
 
   useEffect(async () => {
@@ -66,6 +67,7 @@ const Checkout = ({ user }) => {
   }, []);
 
   const handleOrder = async () => {
+    setClicked(true);
     const subtotal = selected.map((item) => item.price * item.quantity);
     const result = subtotal.reduce((partialSum, a) => partialSum + a, 0);
     //
@@ -73,9 +75,10 @@ const Checkout = ({ user }) => {
     // const newDate = new Date().toJSON().slice(0, 10).replace(/-/g, "/");
     const newOrder = {
       orderDate: newDate,
+      doneStatus: false,
       itemList: selected,
       totalPrice: result,
-      totalQty: getSelectedTotal(),
+      totalQty: getSelectedQty(),
       paymentMethod: payment,
       customerName: user.name,
       customerId: user.userId,
@@ -93,7 +96,7 @@ const Checkout = ({ user }) => {
       if (typeof window !== "undefined") {
         localStorage.clear();
       }
-      router.push("/store");
+      router.push("/transaction");
     } catch (err) {
       console.log(err.message);
       console.log(err.response.data);
@@ -177,6 +180,7 @@ const Checkout = ({ user }) => {
                   variant="contained"
                   onClick={handleOrder}
                   size={stacks ? "small" : "large"}
+                  disabled={clicked}
                 >
                   Order
                 </Button>

@@ -37,22 +37,29 @@ const CartItemList = ({ user }) => {
   const min = 1;
   const max = 0;
 
-  const getPrice = (currentQty, selectedProduct) => {
+  const getPrice = (currentQty, selectedProduct = product) => {
     if (selectedProduct.price.length === 1) {
       return selectedProduct.price[0];
     }
 
     const rules = selectedProduct.price.reduce((a, b) => {
+      console.log("Current Qty");
+      console.log(currentQty);
+      console.log(a.minOrder);
+      console.log(b.minOrder);
       return Math.abs(b.minOrder - currentQty) <
         Math.abs(a.minOrder - currentQty)
-        ? b.minOrder
-        : a.minOrder;
+        ? b
+        : a;
     });
+
+    console.log("rules");
+    console.log(rules);
 
     const priceCheck = selectedProduct.price
       .map((path, i, arr) => {
-        if (path.minOrder === rules) {
-          if (rules <= currentQty) {
+        if (path.minOrder === rules.minOrder) {
+          if (rules.minOrder <= currentQty) {
             return path;
           } else {
             const prevPath = i - 1;
@@ -175,7 +182,6 @@ const CartItemList = ({ user }) => {
       sx={{
         pt: 12,
         pb: 5,
-        minHeight: "120vh",
       }}
       maxWidth="lg"
     >
@@ -247,7 +253,15 @@ const CartItemList = ({ user }) => {
         </Box>
       )}
       {products && (
-        <Box className="f-row" variant="outlined">
+        <Box
+          sx={{
+            minHeight: `${
+              switchNav
+                ? `calc(11.5rem * ${products.length + 1})`
+                : `calc(9rem * ${products.length + 1})`
+            }`,
+          }}
+        >
           <Box className="f-col" sx={{ width: "100%" }}>
             <Box
               className="f-space"
@@ -268,30 +282,6 @@ const CartItemList = ({ user }) => {
             </Box>
 
             <Box sx={{ my: 2 }}>
-              {/* <Card
-                variant="outlined"
-                sx={{ display: "flex", alignItems: "center", px: 2, py: 1 }}
-              >
-                <Checkbox
-                  // checked={checkAll}
-                  sx={{
-                    "& .MuiSvgIcon-root": {
-                      fontSize: `${stacks ? 15 : 30}`,
-                    },
-                  }}
-                  style={{ padding: `${stacks ? 0 : ""}` }}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      // setCheckAll(true);
-                      getSelectedTotal(basket);
-                    } else {
-                      // setCheckAll(false);
-                      getSelectedTotal([]);
-                    }
-                  }}
-                />
-                <Typography sx={{ ml: 1 }}>Select All</Typography>
-              </Card> */}
               {products.map((product) => {
                 return (
                   <Box
@@ -323,6 +313,7 @@ const CartItemList = ({ user }) => {
                             }}
                           >
                             <Checkbox
+                              disabled={product.stockQty > 0 ? false : true}
                               onClick={(e) => {
                                 e.stopPropagation();
                               }}
@@ -391,30 +382,37 @@ const CartItemList = ({ user }) => {
                               sx={{ display: "flex", alignItems: "flex-end" }}
                             >
                               <Typography component="p" fontWeight={"bold"}>
-                                {formatter.format(findCartInfo(product).price)}
+                                {product.stockQty > 0
+                                  ? formatter.format(
+                                      findCartInfo(product).price
+                                    )
+                                  : formatter.format(product.price[0].price)}
                               </Typography>
-                              {findCartInfo(product).price !==
-                                product.price[0].price && (
-                                <Typography
-                                  sx={{
-                                    ml: 1,
-                                    // mb: 0.25,
-                                    textDecoration: "line-through",
-                                  }}
-                                  variant="caption"
-                                  component="p"
-                                >
-                                  {formatter.format(product.price[0].price)}
-                                </Typography>
-                              )}
+                              {product.stockQty > 0 &&
+                                findCartInfo(product).price !==
+                                  product.price[0].price && (
+                                  <Typography
+                                    sx={{
+                                      ml: 1,
+                                      // mb: 0.25,
+                                      textDecoration: "line-through",
+                                    }}
+                                    variant="caption"
+                                    component="p"
+                                  >
+                                    {formatter.format(product.price[0].price)}
+                                  </Typography>
+                                )}
                             </Box>
-                            <Typography variant="caption" component="p">
-                              Total:{" "}
-                              {formatter.format(
-                                findCartInfo(product).price *
-                                  findCartInfo(product).quantity
-                              )}
-                            </Typography>
+                            {product.stockQty > 0 && (
+                              <Typography variant="caption" component="p">
+                                Total:{" "}
+                                {formatter.format(
+                                  findCartInfo(product).price *
+                                    findCartInfo(product).quantity
+                                )}
+                              </Typography>
+                            )}
                           </Box>
                         </Box>
 

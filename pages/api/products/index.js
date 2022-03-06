@@ -26,14 +26,14 @@ const getProduct = async (req, res) => {
     let fixError = false;
     const checkBasket = user.basket.map((obj) => {
       const sameProduct = product.filter((item) => {
-        // console.log(obj.productId);
-        // console.log(item._id);
         return obj.productId === item.id;
       });
 
       const newCartQty = sameProduct[0].stockQty;
 
-      if (obj.quantity > newCartQty) {
+      if (newCartQty === 0) {
+        return obj;
+      } else if (obj.quantity > newCartQty) {
         obj.quantity = newCartQty;
         fixError = true;
       }
@@ -41,6 +41,8 @@ const getProduct = async (req, res) => {
     });
 
     if (fixError) {
+      console.log("Fixing");
+      console.log(checkBasket);
       await User.updateOne(
         { _id: userId },
         {

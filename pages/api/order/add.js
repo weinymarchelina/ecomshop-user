@@ -11,12 +11,15 @@ export default async (req, res) => {
 };
 
 const addOrder = async (req, res) => {
+  const businessId = process.env.BUSINESS_ID;
   try {
     const session = await getSession({ req });
     if (!session) return res.status(400).json({ msg: "Please login first." });
 
     const { userId } = session.user;
     const { newOrder, prevPath } = req.body;
+    newOrder.businessId = businessId;
+    console.log(newOrder);
 
     const order = await new Order(newOrder).save();
     // console.log("Order: ");

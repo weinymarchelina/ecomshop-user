@@ -301,7 +301,7 @@ const Transactions = ({ user }) => {
               })}
             </Box>
 
-            <Card
+            {/* <Card
               variant="outlined"
               sx={{
                 display: "flex",
@@ -312,7 +312,7 @@ const Transactions = ({ user }) => {
                 py: 1,
               }}
             >
-              {/* <Typography
+              <Typography
                 style={{
                   marginRight: `${matches ? "0" : "2rem"}`,
                 }}
@@ -325,8 +325,8 @@ const Transactions = ({ user }) => {
                 variant={stacks ? "caption" : "body1"}
               >
                 {subtotal}
-              </Typography> */}
-            </Card>
+              </Typography>
+            </Card> */}
           </Box>
         </Box>
       )}

@@ -67,13 +67,14 @@ const Product = ({ user }) => {
 
       setProducts(productData);
       setFavItemList(userFavList);
+      console.log(userFavList);
     } catch (err) {
       console.log(err.message);
       console.log(err.response?.data);
 
       throw new Error(err.message);
     }
-  }, [favItemList]);
+  }, []);
 
   const categoryProducts = () => {
     if (selectedCategory === "All") return products;
@@ -146,9 +147,11 @@ const Product = ({ user }) => {
   const finalProducts = sortProducts();
 
   const favoriteStatus = (selectedProduct) => {
-    const getStatus = favItemList.filter(
-      (item) => item === selectedProduct._id
-    );
+    const getStatus = favItemList.filter((item) => {
+      // console.log(`${selectedProduct.name}: ${item === selectedProduct._id}`);
+      return item === selectedProduct._id;
+    });
+
     if (getStatus[0]) {
       return true;
     } else {
@@ -158,16 +161,24 @@ const Product = ({ user }) => {
 
   const handleFavorite = async (e, selectedProduct) => {
     e.stopPropagation();
-    console.log(favItemList);
+    // console.log(favItemList);
 
     const checkResult = favoriteStatus(selectedProduct);
+    // console.log(checkResult);
 
     try {
       await axios.post("/api/products/favorite", {
         productId: selectedProduct._id,
         favorite: checkResult,
       });
-      setFavItemList((prevList) => [...prevList, selectedProduct._id]);
+      if (checkResult) {
+        const newFavItemList = favItemList.filter((item) => {
+          return item !== selectedProduct._id;
+        });
+        setFavItemList(newFavItemList);
+      } else {
+        setFavItemList((prevList) => [...prevList, selectedProduct._id]);
+      }
     } catch (err) {
       console.log(err.response.data.msg);
       return;
@@ -184,7 +195,7 @@ const Product = ({ user }) => {
     >
       {products && (
         <Box className="f-row" variant="outlined" size="small">
-          <Box className="f-col" sx={{ px: 5, width: "100%" }}>
+          <Box className="f-col" sx={{ pb: 5, width: "100%" }}>
             <Box
               className="f-space"
               sx={{
@@ -193,18 +204,14 @@ const Product = ({ user }) => {
                 alignItems: "center",
               }}
             >
-              <Typography
-                className="main-title"
-                variant={matches ? "h5" : "h4"}
-                component="h2"
-              >
+              <Typography className="main-title" variant="h4" component="h2">
                 Store
               </Typography>
             </Box>
 
             {finalProducts && (
               <>
-                <Card variant="outlined" sx={{ mt: 2 }}>
+                <Card variant="outlined" sx={{ mt: 3 }}>
                   <CardContent
                     className={`${matches ? "f-col" : "f-space"}`}
                     sx={{ alignItems: "center", py: 3, gap: 3 }}
