@@ -23,11 +23,38 @@ const getProduct = async (req, res) => {
       businessId: businessId,
     });
 
+    let fixError = false;
+    const checkBasket = user.basket.map((obj) => {
+      const sameProduct = product.filter((item) => {
+        // console.log(obj.productId);
+        // console.log(item._id);
+        return obj.productId === item.id;
+      });
+
+      const newCartQty = sameProduct[0].stockQty;
+
+      if (obj.quantity > newCartQty) {
+        obj.quantity = newCartQty;
+        fixError = true;
+      }
+      return obj;
+    });
+
+    if (fixError) {
+      await User.updateOne(
+        { _id: userId },
+        {
+          basket: checkBasket,
+        }
+      );
+      console.log("fixed");
+    }
+
     res.status(200).json({
       businessCategory: business.category,
       productData: product.filter((product) => product.activeStatus),
       userFavList: user.favList,
-      userBasket: user.basket,
+      userBasket: checkBasket,
     });
   } catch (err) {
     return res.status(500).json(err.message);

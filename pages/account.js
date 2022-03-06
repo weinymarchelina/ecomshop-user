@@ -9,19 +9,14 @@ import {
   Button,
   Avatar,
   Box,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  IconButton,
-  Modal,
-  FormControl,
-  TextField,
 } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import SettingsIcon from "@mui/icons-material/Settings";
-import CheckCircle from "@mui/icons-material/CheckCircle";
-import EditIcon from "@mui/icons-material/Edit";
+
+const formatter = new Intl.NumberFormat("id", {
+  style: "currency",
+  currency: "IDR",
+  minimumFractionDigits: 0,
+});
 
 const Settings = ({ user }) => {
   const [userInfo, setUserInfo] = useState("");
@@ -152,20 +147,8 @@ const Settings = ({ user }) => {
               <Typography className="main-title" variant="h5" component="h2">
                 Other Info
               </Typography>
-
-              {/* <Box>
-                <IconButton
-                  color="primary"
-                  onClick={() => {
-                    // setEditModal(true);
-                  }}
-                >
-                  <EditIcon />
-                </IconButton>
-              </Box> */}
             </Box>
-
-            {/* <Box
+            <Box
               className="f-col"
               sx={{
                 flex: 1,
@@ -183,8 +166,10 @@ const Settings = ({ user }) => {
                 }}
                 className={matches ? "f-col" : "f-space"}
               >
-                <Typography sx={{ fontWeight: 600 }}>Name</Typography>
-                <Typography>{userInfo.name}</Typography>
+                <Typography sx={{ fontWeight: 600 }}>
+                  Total Transactions
+                </Typography>
+                <Typography>{userInfo.totalOrder}</Typography>
               </Box>
               <Box
                 sx={{
@@ -196,8 +181,10 @@ const Settings = ({ user }) => {
                 }}
                 className={matches ? "f-col" : "f-space"}
               >
-                <Typography sx={{ fontWeight: 600 }}>Phone Number</Typography>
-                <Typography>{userInfo.phone}</Typography>
+                <Typography sx={{ fontWeight: 600 }}>
+                  Total Bought Items
+                </Typography>
+                <Typography>{userInfo.totalItem}</Typography>
               </Box>
               <Box
                 sx={{
@@ -209,10 +196,38 @@ const Settings = ({ user }) => {
                 }}
                 className={matches ? "f-col" : "f-space"}
               >
-                <Typography sx={{ fontWeight: 600 }}>Email</Typography>
-                <Typography>{userInfo.email}</Typography>
+                <Typography sx={{ fontWeight: 600 }}>
+                  Total Transactions Amount
+                </Typography>
+                <Typography>{formatter.format(userInfo.totalPaid)}</Typography>
               </Box>
-            </Box> */}
+              {userInfo.favProducts.length > 0 && (
+                <Box
+                  sx={{
+                    borderBottom: 1,
+                    borderColor: "text.secondary",
+                    px: 1,
+                    pb: 1,
+                    mb: 3,
+                  }}
+                  className={matches ? "f-col" : "f-space"}
+                >
+                  <Typography sx={{ fontWeight: 600 }}>
+                    Favorite Products
+                  </Typography>
+                  {/* <Box>
+                    <List>
+                      {userInfo.favProducts
+                        .map((product) => {
+                          return (
+                            //
+                          );
+                        })}
+                    </List>
+                  </Box> */}
+                </Box>
+              )}
+            </Box>
           </CardContent>
         </Card>
       )}
@@ -238,10 +253,3 @@ export async function getServerSideProps(context) {
     props: { user: session.user },
   };
 }
-
-// 101 Kaizer Prism iPhone 12 Pro Max Hard Case
-// Apple New Revolute Airpods 2022
-// Next-Level Headset A2202 Sparks Series
-// USB Type-C Ultra Durable Charger
-// Pops-Cheer iPhone 6s Soft Case
-// Apple Wood-Patterned Wireless Charger

@@ -42,6 +42,9 @@ const createOptions = (req, res) => ({
           name: token.name,
           email: token.email,
           picture: token.picture,
+          totalOrder: 0,
+          totalItem: 0,
+          totalPaid: 0,
         }).save();
         token.userId = user._id;
 

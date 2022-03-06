@@ -183,8 +183,8 @@ const Product = ({ user }) => {
       maxWidth={matches ? "sm" : "lg"}
     >
       {products && (
-        <Card className="f-row" variant="outlined" size="small">
-          <CardContent className="f-col" sx={{ px: 5, width: "100%" }}>
+        <Box className="f-row" variant="outlined" size="small">
+          <Box className="f-col" sx={{ px: 5, width: "100%" }}>
             <Box
               className="f-space"
               sx={{
@@ -391,8 +391,8 @@ const Product = ({ user }) => {
                 </Grid>
               </>
             )}
-          </CardContent>
-        </Card>
+          </Box>
+        </Box>
       )}
     </Container>
   );

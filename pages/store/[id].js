@@ -181,15 +181,12 @@ const DisplayProduct = ({ user }) => {
       const currentCartQty = productCartQty[0] ? productCartQty[0].quantity : 0;
       setCartQty(currentCartQty);
       const expectedQty = 1 + currentCartQty;
-      // console.log(currentCartQty);
-      // console.log(expectedQty);
+
       setPrice(getPrice(expectedQty, mainProduct).price);
       setMax(mainProduct.stockQty - currentCartQty);
-      // setPrice(mainProduct.price[0].price);
       setQuantity(1);
       setProduct(mainProduct);
 
-      // const arrProducts = getNextProducts();
       const allActive = productData.filter((product) => product.stockQty !== 0);
       setNextProducts(getNextProducts(allActive, mainProduct));
     } catch (err) {
@@ -452,7 +449,7 @@ const DisplayProduct = ({ user }) => {
                             </Typography>
                           )}
                         </Box>
-                        {cartQty > 0 && (
+                        {cartQty > 0 && product.stockQty > 0 && (
                           <Box>
                             <Typography variant="subtitle2" sx={{ mt: 1 }}>
                               You have {cartQty} pcs in your cart. By adding{" "}

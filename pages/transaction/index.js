@@ -4,14 +4,7 @@ import {
   CardContent,
   Container,
   Typography,
-  IconButton,
-  TextField,
   Button,
-  Checkbox,
-  FormControl,
-  Input,
-  Select,
-  MenuItem,
 } from "@mui/material";
 import axios from "axios";
 import { useState, useEffect } from "react";
@@ -30,11 +23,9 @@ const formatter = new Intl.NumberFormat("id", {
 });
 
 const Transactions = ({ user }) => {
-  const switchNav = useMediaQuery("(max-width:900px)");
   const matches = useMediaQuery("(max-width:720px)");
   const stacks = useMediaQuery("(max-width:560px)");
   const [orders, setOrders] = useState([]);
-  const [products, setProducts] = useState([]);
   const router = useRouter();
 
   useEffect(async () => {
@@ -49,19 +40,43 @@ const Transactions = ({ user }) => {
         order.firstItemInfo = order.itemList[0];
         order.firstItem = firstProduct[0];
         order.productQty = order.itemList.length;
+
+        for (const item of order.itemList) {
+          const product = productData.filter(
+            (product) => product._id === item.productId
+          );
+          item.priceList = product[0].price;
+        }
       }
 
       console.log(orderData);
 
-      // const sortedOrder = orderData.sort((a, b) => b.createdAt < a.createdAt);
-      // setOrders(sortedOrder);
       setOrders(orderData);
-      // setProducts(productData);
     } catch (err) {
       console.log(err.message);
       throw new Error(err.message);
     }
   }, []);
+
+  const getStatus = (order) => {
+    if (order.doneStatus) {
+      return "Finished";
+    } else if (order.finishDate === "-") {
+      return "Canceled";
+    } else {
+      return "On Process";
+    }
+  };
+
+  const getColor = (order) => {
+    if (order.doneStatus) {
+      return "green";
+    } else if (order.finishDate === "-") {
+      return "#ccc";
+    } else {
+      return "#eee";
+    }
+  };
 
   const handleBuy = async (order) => {
     console.log(order.itemList);
@@ -217,7 +232,6 @@ const Transactions = ({ user }) => {
                                 stacks ? "row-reverse" : "column"
                               }`,
                               justifyContent: "space-between",
-                              // alignItems: "flex-end",
                             }}
                           >
                             <Box sx={{ mt: 2 }}>
@@ -231,12 +245,10 @@ const Transactions = ({ user }) => {
                                   px: 1,
                                   py: 0.5,
                                   borderRadius: "0.35vw",
-                                  backgroundColor: `${
-                                    !order.doneStatus ? "#eee" : "green"
-                                  }`,
+                                  backgroundColor: getColor(order),
                                 }}
                               >
-                                {!order.doneStatus ? "In Process" : "Done"}
+                                {getStatus(order)}
                               </Typography>
                             </Box>
                             <Box sx={{ mr: 2 }}>

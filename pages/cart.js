@@ -95,6 +95,8 @@ const CartItemList = ({ user }) => {
       setProducts(sortedProducts);
     } catch (err) {
       console.log(err.message);
+
+      console.log(err.response?.data);
       throw new Error(err.message);
     }
   }, []);

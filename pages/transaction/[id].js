@@ -45,16 +45,6 @@ const DisplayOrder = ({ user }) => {
     try {
       const res = await axios.post("/api/order/", { orderId: id });
       const { orderData, productData } = res.data;
-
-      //   for (const item of orderData.itemList) {
-      //     const orderedProducts = productData.filter(
-      //       (product) => product._id === item.productId
-      //     );
-      //     console.log(item);
-      //     console.log(orderedProducts);
-      //     // return orderedProducts
-      //   }
-
       const orderedProductList = orderData.itemList.map((item) => {
         const orderedProducts = productData.filter(
           (product) => product._id === item.productId
@@ -74,6 +64,26 @@ const DisplayOrder = ({ user }) => {
       throw new Error(err.message);
     }
   }, [id]);
+
+  const getStatus = (order) => {
+    if (order.doneStatus) {
+      return "Finished";
+    } else if (order.finishDate === "-") {
+      return "Canceled";
+    } else {
+      return "On Process";
+    }
+  };
+
+  const getColor = (order) => {
+    if (order.doneStatus) {
+      return "green";
+    } else if (order.finishDate === "-") {
+      return "#ccc";
+    } else {
+      return "#eee";
+    }
+  };
 
   return (
     <Container
@@ -134,10 +144,10 @@ const DisplayOrder = ({ user }) => {
                     px: 1,
                     py: 0.5,
                     borderRadius: "0.35vw",
-                    backgroundColor: `${!order.doneStatus ? "#eee" : "green"}`,
+                    backgroundColor: getColor(order),
                   }}
                 >
-                  {!order.doneStatus ? "In Process" : "Done"}
+                  {getStatus(order)}
                 </Typography>
               </Card>
             )}
@@ -220,28 +230,6 @@ const DisplayOrder = ({ user }) => {
                             </Typography>
                           </Box>
                         </Box>
-                        {/* <Box
-                          className={switchNav ? "" : "f-col"}
-                          sx={{
-                            display: "flex",
-                            justifyContent: `${
-                              switchNav ? "flex-end" : "space-between"
-                            }`,
-                            alignItems: "flex-end",
-                          }}
-                        ></Box>
-                        <Box>
-                          <Box
-                            sx={{
-                              opacity: 1,
-                              zIndex: 1,
-                            }}
-                          >
-                            <Button variant="contained" onClick={handleBuy}>
-                              Buy
-                            </Button>
-                          </Box>
-                        </Box> */}
                       </CardContent>
                     </Card>
                   </Box>
@@ -271,7 +259,7 @@ const DisplayOrder = ({ user }) => {
                   </Typography>
                 </Card>
 
-                {order.doneStatus && (
+                {order.doneStatus && order.doneStatus !== "-" && (
                   <Card
                     variant="outlined"
                     sx={{

@@ -19,10 +19,10 @@ import {
 
 const links = [
   "Store",
-  "Cart",
   "Favorite",
+  "Cart",
   "Transaction",
-  "Notification",
+  "Whatsapp",
   "Account",
 ];
 
@@ -76,10 +76,10 @@ const Navbar = () => {
                 </IconButton>
                 <IconButton
                   size="large"
-                  onClick={() => router.push("/notification")}
+                  onClick={() => router.push("/whatsapp")}
                   color="inherit"
                 >
-                  <NotificationsIcon />
+                  <img src="/whatsapp-icon.svg" style={{ width: "22px" }} />
                 </IconButton>
               </Box>
             )}
