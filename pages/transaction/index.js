@@ -5,6 +5,11 @@ import {
   Container,
   Typography,
   Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
 } from "@mui/material";
 import axios from "axios";
 import { useState, useEffect } from "react";
@@ -27,6 +32,16 @@ const Transactions = ({ user }) => {
   const stacks = useMediaQuery("(max-width:560px)");
   const [orders, setOrders] = useState([]);
   const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filter, setFilter] = useState("All");
+  const filterList = [
+    "Unfinished",
+    "Finished",
+    "Canceled",
+    "Today",
+    "This Week",
+    "This Month",
+  ];
 
   useEffect(async () => {
     try {
@@ -58,6 +73,86 @@ const Transactions = ({ user }) => {
     }
   }, []);
 
+  const filterOrders = () => {
+    let filteredOrders;
+    if (orders) {
+      switch (filter) {
+        case "Unfinished":
+          filteredOrders = orders.filter((order) => !order.doneStatus);
+
+          break;
+
+        case "Finished":
+          filteredOrders = orders.filter(
+            (order) => order.doneStatus && order.finishDate !== "-"
+          );
+
+          break;
+
+        case "Canceled":
+          filteredOrders = orders.filter(
+            (order) => order.doneStatus && order.finishDate === "-"
+          );
+          console.log(filteredOrders);
+          break;
+
+        case "Today":
+          filteredOrders = orders.filter(
+            (order) =>
+              moment(order.createdAt).format("LL") ===
+              moment(new Date()).format("LL")
+          );
+
+          break;
+
+        case "This Week":
+          filteredOrders = orders.filter((order) => {
+            const startDayOfPrevWeek = moment(new Date())
+              .startOf("week")
+              .format("lll");
+            const lastDayOfPrevWeek = moment(new Date())
+              .endOf("week")
+              .format("lll");
+
+            const orderDate = moment(order.createdAt).format("lll");
+
+            return moment(orderDate).isBetween(
+              startDayOfPrevWeek,
+              lastDayOfPrevWeek
+            );
+          });
+
+          break;
+
+        case "This Month":
+          filteredOrders = orders.filter((order) => {
+            const startDayOfMonth = moment(new Date())
+              .startOf("month")
+              .format("lll");
+            const lastDayOfMonth = moment(new Date())
+              .endOf("month")
+              .format("lll");
+
+            const orderDate = moment(order.createdAt).format("lll");
+
+            return moment(orderDate).isBetween(startDayOfMonth, lastDayOfMonth);
+          });
+
+          break;
+
+        default:
+          filteredOrders = orders;
+
+          break;
+      }
+    } else {
+      filteredOrders = orders;
+    }
+
+    return filteredOrders;
+  };
+  const newOrders = filterOrders();
+
   const getStatus = (order) => {
     if (order.doneStatus) {
       return "Finished";
@@ -68,13 +163,20 @@ const Transactions = ({ user }) => {
     }
   };
 
-  const getColor = (order) => {
+  const getStyle = (order) => {
     if (order.doneStatus) {
-      return "green";
+      return {
+        backgroundColor: "#58B24D",
+        color: "#fff",
+      };
     } else if (order.finishDate === "-") {
-      return "#ccc";
+      return {
+        backgroundColor: "#ccc",
+      };
     } else {
-      return "#eee";
+      return {
+        backgroundColor: "#eee",
+      };
     }
   };
 
@@ -124,8 +226,52 @@ const Transactions = ({ user }) => {
               </Typography>
             </Box>
 
+            {newOrders && (
+              <Card variant="outlined" sx={{ mt: 3 }}>
+                <CardContent
+                  className={`${matches ? "f-col" : "f-space"}`}
+                  sx={{ alignItems: "center", py: 3, gap: 3 }}
+                >
+                  <Box
+                    className="f-space"
+                    sx={{ flex: 2, gap: 3, width: "100%" }}
+                  >
+                    <FormControl variant="standard" sx={{ flex: 1 }}>
+                      <InputLabel>Filter</InputLabel>
+                      <Select
+                        value={filter}
+                        label="Category"
+                        onChange={(e) => setFilter(e.target.value)}
+                      >
+                        <MenuItem value="All">
+                          <Typography variant="subtitle1" component="p">
+                            All
+                          </Typography>
+                        </MenuItem>
+                        {filterList.map((filter) => (
+                          <MenuItem key={filter} value={filter}>
+                            <Typography variant="subtitle1" component="p">
+                              {filter}
+                            </Typography>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Box>
+                  {/* <TextField
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    label="Search"
+                    variant="standard"
+                    sx={{ flex: 2, pt: 0.65 }}
+                    autoComplete="off"
+                    fullWidth
+                  /> */}
+                </CardContent>
+              </Card>
+            )}
+
             <Box sx={{ mt: 2 }}>
-              {orders.map((order) => {
+              {newOrders.map((order) => {
                 return (
                   <Box key={order._id}>
                     <Card variant="outlined">
@@ -146,7 +292,6 @@ const Transactions = ({ user }) => {
                           }
                         >
                           <Box
-                            // className="f-row"
                             sx={{
                               display: "flex",
                               alignItems: `${stacks ? "center" : "flex-start"}`,
@@ -215,14 +360,6 @@ const Transactions = ({ user }) => {
                                   </Typography>
                                 )}
                               </Box>
-
-                              {/* <Typography variant="caption" component="p">
-                              Total:{" "}
-                              {formatter.format(
-                                order.itemList[0].price *
-                                  order.itemList[0].quantity
-                              )}
-                            </Typography> */}
                             </Box>
                           </Box>
                           <Box
@@ -245,8 +382,9 @@ const Transactions = ({ user }) => {
                                   px: 1,
                                   py: 0.5,
                                   borderRadius: "0.35vw",
-                                  backgroundColor: getColor(order),
+                                  // backgroundColor: getColor(order),
                                 }}
+                                style={getStyle(order)}
                               >
                                 {getStatus(order)}
                               </Typography>
@@ -300,33 +438,6 @@ const Transactions = ({ user }) => {
                 );
               })}
             </Box>
-
-            {/* <Card
-              variant="outlined"
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-
-                px: 2,
-                py: 1,
-              }}
-            >
-              <Typography
-                style={{
-                  marginRight: `${matches ? "0" : "2rem"}`,
-                }}
-                variant={stacks ? "caption" : "body1"}
-              >
-                Total Order {`(${getSelectedQty()} Items)`}
-              </Typography>
-              <Typography
-                sx={{ textAlign: "right" }}
-                variant={stacks ? "caption" : "body1"}
-              >
-                {subtotal}
-              </Typography>
-            </Card> */}
           </Box>
         </Box>
       )}
@@ -352,3 +463,33 @@ export async function getServerSideProps(context) {
     props: { user: session.user },
   };
 }
+
+// for (const order of orderData) {
+//   const firstProduct = productData.filter(
+//     (product) => product._id === order.itemList[0].productId
+//   );
+//   order.firstItemInfo = order.itemList[0];
+//   order.firstItem = firstProduct[0];
+//   order.productQty = order.itemList.length;
+
+//   for (const item of order.itemList) {
+//     const product = productData.filter(
+//       (product) => product._id === item.productId
+//     );
+
+//     const productNames = [];
+//     productData.forEach((product) => {
+//       if (
+//         item.productId === product._id &&
+//         !products.includes(product._id)
+//       ) {
+//         productNames.push(product.name);
+//       }
+//     });
+
+//     console.log(productNames);
+//     setProducts((prev) => [...prev, productNames]);
+
+//     item.priceList = product[0].price;
+//   }
+// }

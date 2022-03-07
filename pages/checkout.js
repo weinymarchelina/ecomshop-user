@@ -72,7 +72,6 @@ const Checkout = ({ user }) => {
     const result = subtotal.reduce((partialSum, a) => partialSum + a, 0);
     //
     const newDate = new Date();
-    // const newDate = new Date().toJSON().slice(0, 10).replace(/-/g, "/");
     const newOrder = {
       orderDate: newDate,
       doneStatus: false,

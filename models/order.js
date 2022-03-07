@@ -11,6 +11,7 @@ const OrderSchema = new mongoose.Schema(
     customerId: String,
     doneStatus: Boolean,
     note: String,
+    businessId: String,
   },
   { timestamps: true }
 );
