@@ -18,6 +18,7 @@ import { useState, useEffect } from "react";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { Co2Sharp } from "@mui/icons-material";
 
 const formatter = new Intl.NumberFormat("id", {
   style: "currency",
@@ -36,7 +37,7 @@ const Checkout = ({ user }) => {
   const [selected, setSelected] = useState([]);
   const [subtotal, setSubtotal] = useState(formatter.format(0));
   const [prevPath, setPrevPath] = useState();
-  const [clicked, setClicked] = useState(false);
+  const [clicked, setClicked] = useState(true);
   const router = useRouter();
 
   useEffect(async () => {
@@ -46,6 +47,13 @@ const Checkout = ({ user }) => {
     setPrevPath(prevPath);
 
     console.log(selectedItems);
+    const findCartInfo = (product) => {
+      const findInfo = selectedItems.filter((obj) => {
+        return obj.productId === product._id;
+      });
+      console.log(findInfo);
+      return findInfo[0];
+    };
 
     try {
       const res = await axios.get("/api/products/");
@@ -56,9 +64,26 @@ const Checkout = ({ user }) => {
         return result[0];
       });
 
+      const inactiveItems = selectedProducts.filter((product) => {
+        return product.stockQty < findCartInfo(product)?.quantity;
+      });
+      // console.log(inactiveItems);
+      if (inactiveItems[0]) {
+        // handle update cart based on the new max quantity and edit the price according to the stock
+        try {
+          //
+        } catch (err) {
+          console.log(err.message);
+          console.log(err.response.data);
+          throw new Error(err.message);
+        }
+        router.push("/cart");
+      }
+
       setSelected(selectedItems);
       setProducts(selectedProducts);
       getSelectedTotal(selectedItems);
+      setClicked(false);
     } catch (err) {
       console.log(err.message);
 
