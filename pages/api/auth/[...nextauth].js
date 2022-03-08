@@ -4,7 +4,7 @@ const User = require("../../../models/user");
 import dbConnect from "../../../db/database";
 
 dbConnect();
-
+const businessId = process.env.BUSINESS_ID;
 const createOptions = (req, res) => ({
   providers: [
     GoogleProvider({
@@ -42,9 +42,13 @@ const createOptions = (req, res) => ({
           name: token.name,
           email: token.email,
           picture: token.picture,
+          businessId,
           totalOrder: 0,
           totalItem: 0,
           totalPaid: 0,
+          contactInfo: {
+            name: "",
+          },
         }).save();
         token.userId = user._id;
 

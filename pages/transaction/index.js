@@ -99,7 +99,7 @@ const Transactions = ({ user }) => {
         case "Today":
           filteredOrders = orders.filter(
             (order) =>
-              moment(order.createdAt).format("LL") ===
+              moment(new Date(order.createdAt)).format("LL") ===
               moment(new Date()).format("LL")
           );
 
@@ -114,9 +114,9 @@ const Transactions = ({ user }) => {
               .endOf("week")
               .format("lll");
 
-            const orderDate = moment(order.createdAt).format("lll");
+            const orderDate = moment(new Date(order.createdAt)).format("lll");
 
-            return moment(orderDate).isBetween(
+            return moment(new Date(orderDate)).isBetween(
               startDayOfPrevWeek,
               lastDayOfPrevWeek
             );
@@ -133,9 +133,12 @@ const Transactions = ({ user }) => {
               .endOf("month")
               .format("lll");
 
-            const orderDate = moment(order.createdAt).format("lll");
+            const orderDate = moment(new Date(order.createdAt)).format("lll");
 
-            return moment(orderDate).isBetween(startDayOfMonth, lastDayOfMonth);
+            return moment(new Date(orderDate)).isBetween(
+              startDayOfMonth,
+              lastDayOfMonth
+            );
           });
 
           break;
@@ -154,24 +157,24 @@ const Transactions = ({ user }) => {
   const newOrders = filterOrders();
 
   const getStatus = (order) => {
-    if (order.doneStatus) {
-      return "Finished";
-    } else if (order.finishDate === "-") {
+    if (order.finishDate === "-") {
       return "Canceled";
+    } else if (order.doneStatus && order.finishDate !== "-") {
+      return "Finished";
     } else {
       return "On Process";
     }
   };
 
   const getStyle = (order) => {
-    if (order.doneStatus) {
+    if (order.finishDate === "-") {
+      return {
+        backgroundColor: "#ccc",
+      };
+    } else if (order.doneStatus && order.finishDate !== "-") {
       return {
         backgroundColor: "#58B24D",
         color: "#fff",
-      };
-    } else if (order.finishDate === "-") {
-      return {
-        backgroundColor: "#ccc",
       };
     } else {
       return {

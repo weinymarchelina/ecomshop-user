@@ -77,6 +77,9 @@ const Checkout = ({ user }) => {
             inactiveItems,
           });
 
+          if (typeof window !== "undefined") {
+            localStorage.clear();
+          }
           console.log(res.data.empty);
           if (!res.data.empty) {
             router.push("/cart");

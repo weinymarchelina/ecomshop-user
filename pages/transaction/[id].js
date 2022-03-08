@@ -66,10 +66,10 @@ const DisplayOrder = ({ user }) => {
   }, [id]);
 
   const getStatus = (order) => {
-    if (order.doneStatus) {
-      return "Finished";
-    } else if (order.finishDate === "-") {
+    if (order.finishDate === "-") {
       return "Canceled";
+    } else if (order.doneStatus && order.finishDate !== "-") {
+      return "Finished";
     } else {
       return "On Process";
     }
@@ -80,7 +80,7 @@ const DisplayOrder = ({ user }) => {
       return {
         backgroundColor: "#ccc",
       };
-    } else if (order.doneStatus) {
+    } else if (order.doneStatus && order.finishDate !== "-") {
       return {
         backgroundColor: "#58B24D",
         color: "#fff",
@@ -263,7 +263,7 @@ const DisplayOrder = ({ user }) => {
                     variant={stacks ? "caption" : "body1"}
                     textAlign="right"
                   >
-                    {moment(order.createdAt).format("LLL")}
+                    {moment(new Date(order.createdAt)).format("LLL")}
                   </Typography>
                 </Card>
 
@@ -285,7 +285,7 @@ const DisplayOrder = ({ user }) => {
                       variant={stacks ? "caption" : "body1"}
                       textAlign="right"
                     >
-                      {moment(order.finishDate).format("LLL")}
+                      {moment(new Date(order.finishDate)).format("LLL")}
                     </Typography>
                   </Card>
                 )}

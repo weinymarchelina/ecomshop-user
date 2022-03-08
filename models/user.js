@@ -18,6 +18,7 @@ const UserSchema = new mongoose.Schema(
     totalItem: Number,
     totalPaid: Number,
     favProducts: Array,
+    businessId: String,
   },
   { timestamps: true }
 );
