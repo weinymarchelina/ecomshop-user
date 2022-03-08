@@ -58,31 +58,51 @@ const Checkout = ({ user }) => {
     try {
       const res = await axios.get("/api/products/");
       const { productData } = res.data;
+      console.log(productData);
 
       const selectedProducts = selectedItems.map((obj) => {
         const result = productData.filter((item) => obj.productId === item._id);
         return result[0];
       });
+      console.log(selectedProducts);
 
       const inactiveItems = selectedProducts.filter((product) => {
         return product.stockQty < findCartInfo(product)?.quantity;
       });
-      // console.log(inactiveItems);
+
       if (inactiveItems[0]) {
-        // handle update cart based on the new max quantity and edit the price according to the stock
+        console.log("AYYYYY");
         try {
-          //
+          const res = await axios.post("/api/products/update", {
+            inactiveItems,
+          });
+
+          console.log(res.data.empty);
+          if (!res.data.empty) {
+            router.push("/cart");
+          }
+
+          const newSelected = res.data.newSelected.filter((item) => {
+            const deItems = selectedItems.filter(
+              (obj) => item.productId === obj.productId
+            );
+            return deItems[0];
+          });
+          setSelected(newSelected);
+          getSelectedTotal(newSelected);
         } catch (err) {
           console.log(err.message);
           console.log(err.response.data);
           throw new Error(err.message);
         }
-        router.push("/cart");
+
+        // router.push("/cart");
+      } else {
+        setSelected(selectedItems);
+        getSelectedTotal(selectedItems);
       }
 
-      setSelected(selectedItems);
       setProducts(selectedProducts);
-      getSelectedTotal(selectedItems);
       setClicked(false);
     } catch (err) {
       console.log(err.message);
@@ -93,6 +113,32 @@ const Checkout = ({ user }) => {
 
   const handleOrder = async () => {
     setClicked(true);
+    try {
+      const res = await axios.get("/api/products/");
+      console.log(res.data);
+      const { productData } = res.data;
+      const selectedProducts = selected.map((obj) => {
+        const result = productData.filter((item) => obj.productId === item._id);
+        return result[0];
+      });
+
+      const inactiveItems = selectedProducts.filter((product) => {
+        return product.stockQty < findCartInfo(product)?.quantity;
+      });
+      console.log(inactiveItems);
+
+      if (inactiveItems[0]) {
+        console.log("HAYO");
+        window.location.reload();
+        return;
+      }
+    } catch (err) {
+      console.log(err.message);
+      console.log(err.response.data);
+      throw new Error(err.message);
+    }
+
+    //
     const subtotal = selected.map((item) => item.price * item.quantity);
     const result = subtotal.reduce((partialSum, a) => partialSum + a, 0);
     //
@@ -108,8 +154,6 @@ const Checkout = ({ user }) => {
       customerId: user.userId,
       note: note,
     };
-    console.log(newOrder);
-    console.log(prevPath);
 
     try {
       const res = await axios.post("/api/order/add", {

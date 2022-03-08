@@ -546,7 +546,7 @@ const DisplayProduct = ({ user }) => {
                                   <RemoveIcon fontSize="small" />
                                 </span>
                                 <TextField
-                                  autocomplete="off"
+                                  autoComplete="off"
                                   inputProps={{
                                     min,
                                     max,

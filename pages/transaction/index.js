@@ -258,14 +258,6 @@ const Transactions = ({ user }) => {
                       </Select>
                     </FormControl>
                   </Box>
-                  {/* <TextField
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    label="Search"
-                    variant="standard"
-                    sx={{ flex: 2, pt: 0.65 }}
-                    autoComplete="off"
-                    fullWidth
-                  /> */}
                 </CardContent>
               </Card>
             )}

@@ -382,6 +382,11 @@ const CartItemList = ({ user }) => {
                               sx={{ display: "flex", alignItems: "flex-end" }}
                             >
                               <Typography component="p" fontWeight={"bold"}>
+                                {/* //! handle this into conditional to displayprice */}
+                                {/* {findCartInfo(product).quantity >
+                                    product.stockQty
+                                      ? product.stockQty
+                                      : findCartInfo(product).quantity} */}
                                 {product.stockQty > 0
                                   ? formatter.format(
                                       findCartInfo(product).price
@@ -533,7 +538,12 @@ const CartItemList = ({ user }) => {
                                   }}
                                   type="number"
                                   size="small"
-                                  value={findCartInfo(product).quantity}
+                                  value={
+                                    findCartInfo(product).quantity >
+                                    product.stockQty
+                                      ? product.stockQty
+                                      : findCartInfo(product).quantity
+                                  }
                                   onClick={(e) => e.stopPropagation()}
                                   onChange={(e) => {
                                     let value = parseInt(e.target.value, 10);
