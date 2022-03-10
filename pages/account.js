@@ -9,7 +9,10 @@ import {
   Button,
   Avatar,
   Box,
+  ListItem,
+  List,
 } from "@mui/material";
+import { useRouter } from "next/router";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 const formatter = new Intl.NumberFormat("id", {
@@ -20,15 +23,19 @@ const formatter = new Intl.NumberFormat("id", {
 
 const Settings = ({ user }) => {
   const [userInfo, setUserInfo] = useState("");
-
+  const [topItems, setTopItems] = useState("");
+  const stacks = useMediaQuery("(max-width:560px)");
   const matches = useMediaQuery("(max-width:720px)");
+  const router = useRouter();
 
   useEffect(async () => {
     try {
       const res = await axios.get("/api/data/user");
-      const { user } = res.data;
+      const { user, topItems } = res.data;
       console.log(user);
+      console.log(topItems);
       setUserInfo(user);
+      setTopItems(topItems);
     } catch (err) {
       console.log(err.message);
       throw new Error(err.message);
@@ -201,7 +208,7 @@ const Settings = ({ user }) => {
                 </Typography>
                 <Typography>{formatter.format(userInfo.totalPaid)}</Typography>
               </Box>
-              {userInfo.favProducts.length > 0 && (
+              {topItems.length > 0 && (
                 <Box
                   sx={{
                     borderBottom: 1,
@@ -210,21 +217,113 @@ const Settings = ({ user }) => {
                     pb: 1,
                     mb: 3,
                   }}
-                  className={matches ? "f-col" : "f-space"}
+                  className="f-col"
                 >
                   <Typography sx={{ fontWeight: 600 }}>
                     Favorite Products
                   </Typography>
-                  {/* <Box>
-                    <List>
-                      {userInfo.favProducts
-                        .map((product) => {
-                          return (
-                            //
-                          );
-                        })}
+                  <Box sx={{ my: 2 }}>
+                    <List sx={{ width: "100%" }}>
+                      {topItems.map((product) => {
+                        return (
+                          <Box
+                            sx={{
+                              cursor: "pointer",
+                              width: "100%",
+                            }}
+                            key={product._id}
+                          >
+                            <Card
+                              variant="outlined"
+                              sx={{
+                                backgroundColor: `${
+                                  product.stockQty === 0
+                                    ? "#aaa"
+                                    : "transparent"
+                                }`,
+                              }}
+                            >
+                              <CardContent
+                                className={matches ? "f-col" : "f-space"}
+                              >
+                                <Box className="f-row">
+                                  <Box>
+                                    <img
+                                      src={product.image[0]}
+                                      alt={`${product.name}-img`}
+                                      style={{
+                                        width: `${
+                                          stacks
+                                            ? "3.75rem"
+                                            : "calc(5rem + 1vw)"
+                                        }`,
+                                        height: `${
+                                          stacks
+                                            ? "3.75rem"
+                                            : "calc(5rem + 1vw)"
+                                        }`,
+                                        margin: "0 .5rem",
+                                        opacity: `${
+                                          product.stockQty === 0 ? 0.7 : 1
+                                        }`,
+                                      }}
+                                    />
+                                  </Box>
+                                  <Box
+                                    sx={{
+                                      px: 1,
+                                      flex: 1,
+                                      width: `${matches ? "9rem" : "auto"}`,
+                                    }}
+                                  >
+                                    <Typography
+                                      variant="body1"
+                                      component="h2"
+                                      noWrap
+                                      sx={{ width: "100%" }}
+                                    >
+                                      {product.name}
+                                    </Typography>
+                                    <Box
+                                      sx={{
+                                        display: "flex",
+                                        alignItems: "flex-end",
+                                      }}
+                                    >
+                                      <Typography
+                                        component="p"
+                                        fontWeight={"bold"}
+                                      >
+                                        {product.buyedQty} pcs
+                                      </Typography>
+                                    </Box>
+                                    <Typography variant="caption" component="p">
+                                      Total: {formatter.format(product.amount)}
+                                    </Typography>
+                                  </Box>
+                                </Box>
+                                <Button
+                                  onClick={() => {
+                                    router.push(`store/${product.productId}`);
+                                  }}
+                                  size={matches ? "small" : "large"}
+                                  variant="contained"
+                                  sx={{
+                                    alignSelf: `${
+                                      matches ? "flex-end" : "center"
+                                    }`,
+                                    my: 0.5,
+                                  }}
+                                >
+                                  Buy
+                                </Button>
+                              </CardContent>
+                            </Card>
+                          </Box>
+                        );
+                      })}
                     </List>
-                  </Box> */}
+                  </Box>
                 </Box>
               )}
             </Box>

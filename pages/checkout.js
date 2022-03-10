@@ -18,7 +18,6 @@ import { useState, useEffect } from "react";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { Co2Sharp } from "@mui/icons-material";
 
 const formatter = new Intl.NumberFormat("id", {
   style: "currency",
