@@ -27,7 +27,11 @@ const getUser = async (req, res) => {
 
       for (const order of orders) {
         for (const item of order.itemList) {
-          if (item.productId === product.id) {
+          if (
+            item.productId === product.id &&
+            order.doneStatus &&
+            order.finishDate !== "-"
+          ) {
             buyedQty = buyedQty += item.quantity;
             amount = amount += item.quantity * item.price;
           }

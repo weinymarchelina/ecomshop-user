@@ -8,16 +8,12 @@ export default async (req, res) => {
   await addCart(req, res);
 };
 
-const getPrice = (currentQty, selectedProduct = product) => {
-  if (selectedProduct.price.length === 1) {
-    return selectedProduct.price[0];
+const getPrice = (currentQty, selectedProductPrice) => {
+  if (selectedProductPrice.length === 1) {
+    return selectedProductPrice[0];
   }
 
-  const rules = selectedProduct.price.reduce((a, b) => {
-    console.log("Current Qty");
-    console.log(currentQty);
-    console.log(a.minOrder);
-    console.log(b.minOrder);
+  const rules = selectedProductPrice.reduce((a, b) => {
     return Math.abs(b.minOrder - currentQty) < Math.abs(a.minOrder - currentQty)
       ? b
       : a;
@@ -26,7 +22,7 @@ const getPrice = (currentQty, selectedProduct = product) => {
   console.log("rules");
   console.log(rules);
 
-  const priceCheck = selectedProduct.price
+  const priceCheck = selectedProductPrice
     .map((path, i, arr) => {
       if (path.minOrder === rules.minOrder) {
         if (rules.minOrder <= currentQty) {
@@ -59,6 +55,7 @@ const addCart = async (req, res) => {
         console.log(basketObj);
         basketObj.quantity = basketObj.quantity + sameProduct[0].quantity;
 
+        console.log(basketObj.priceList);
         const newPrice = getPrice(basketObj.quantity, basketObj.priceList);
         basketObj.price = newPrice.price;
 

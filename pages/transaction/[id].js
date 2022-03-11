@@ -208,7 +208,7 @@ const DisplayOrder = ({ user }) => {
                             <Typography
                               variant="body1"
                               component="h2"
-                              noWrap
+                              noWrap={matches ? true : false}
                               sx={{ width: "100%" }}
                             >
                               {product.name}

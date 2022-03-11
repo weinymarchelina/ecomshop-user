@@ -36,11 +36,15 @@ const Checkout = ({ user }) => {
   const [selected, setSelected] = useState([]);
   const [subtotal, setSubtotal] = useState(formatter.format(0));
   const [prevPath, setPrevPath] = useState();
-  const [clicked, setClicked] = useState(true);
+  const [clicked, setClicked] = useState(false);
   const router = useRouter();
 
   useEffect(async () => {
     // console.log(user);
+    if (!window.localStorage.selected) {
+      router.push("/store");
+      return;
+    }
     const selectedItems = JSON.parse(window.localStorage.selected);
     const prevPath = window.localStorage.prevpath;
     setPrevPath(prevPath);
@@ -105,7 +109,6 @@ const Checkout = ({ user }) => {
       }
 
       setProducts(selectedProducts);
-      setClicked(false);
     } catch (err) {
       console.log(err.message);
 
@@ -114,7 +117,6 @@ const Checkout = ({ user }) => {
   }, []);
 
   const handleOrder = async () => {
-    setClicked(true);
     try {
       const res = await axios.get("/api/products/");
       console.log(res.data);
@@ -166,7 +168,11 @@ const Checkout = ({ user }) => {
       if (typeof window !== "undefined") {
         localStorage.clear();
       }
-      router.push("/transaction");
+      setClicked(true);
+      setTimeout(() => {
+        router.push("/transaction");
+      }, 3000);
+      // router.push("/transaction");
     } catch (err) {
       console.log(err.message);
       console.log(err.response.data);
@@ -200,7 +206,7 @@ const Checkout = ({ user }) => {
       }}
       maxWidth="lg"
     >
-      {products && (
+      {products && !clicked && (
         <Box
           sx={{
             position: "fixed",
@@ -248,9 +254,12 @@ const Checkout = ({ user }) => {
                 <Button
                   sx={{ mr: 0.5 }}
                   variant="contained"
-                  onClick={handleOrder}
+                  onClick={(e) => {
+                    e.target.disabled = true;
+                    console.log(e.target.disabled);
+                    handleOrder();
+                  }}
                   size={stacks ? "small" : "large"}
-                  disabled={clicked}
                 >
                   Order
                 </Button>
@@ -259,7 +268,7 @@ const Checkout = ({ user }) => {
           </Container>
         </Box>
       )}
-      {products && (
+      {products && !clicked && (
         <Box className="f-row" variant="outlined">
           <Box className="f-col" sx={{ width: "100%" }}>
             <Box
@@ -325,7 +334,7 @@ const Checkout = ({ user }) => {
                             <Typography
                               variant="body1"
                               component="h2"
-                              noWrap
+                              noWrap={matches ? true : false}
                               sx={{ width: "100%" }}
                             >
                               {product.name}
@@ -464,6 +473,36 @@ const Checkout = ({ user }) => {
             </Card>
           </Box>
         </Box>
+      )}
+      {clicked && (
+        <Card variant="outlined" sx={{ width: "100%" }}>
+          <CardContent sx={{ p: 5, textAlign: "center" }} className="f-column">
+            <Typography
+              sx={{
+                mb: 3,
+              }}
+              className="main-title"
+              variant={matches ? "h6" : "h4"}
+              component="p"
+              gutterBottom
+            >
+              Transaction Success
+            </Typography>
+            <Typography
+              sx={{ lineHeight: "125%", width: `${matches ? "auto" : "45ch"}` }}
+              variant={matches ? "p" : "h6"}
+              component="p"
+              gutterBottom
+            >
+              Redirecting you to your transaction list in 3 seconds...
+            </Typography>
+            <img
+              className="svg-login"
+              src="/svg-success-order.svg"
+              alt="svg-not-found"
+            />
+          </CardContent>
+        </Card>
       )}
     </Container>
   );

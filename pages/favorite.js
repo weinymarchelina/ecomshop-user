@@ -123,7 +123,15 @@ const FavoriteItemList = ({ user }) => {
                 Favorite List
               </Typography>
               <Box sx={{}} className={matches ? "f-col" : "f-row"}>
-                <Button sx={{}} variant="contained" onClick={handleSave}>
+                <Button
+                  sx={{}}
+                  variant="contained"
+                  onClick={(e) => {
+                    e.target.disabled = true;
+                    console.log(e.target.disabled);
+                    handleSave();
+                  }}
+                >
                   Save
                 </Button>
               </Box>

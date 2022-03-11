@@ -13,7 +13,7 @@ const addCart = async (req, res) => {
     const session = await getSession({ req });
     if (!session) return res.status(400).json({ msg: "Please login first." });
     const { userId } = session.user;
-    const { price, quantity, productId, added, basket } = req.body;
+    const { price, quantity, productId, added, basket, priceList } = req.body;
 
     if (added === "Update") {
       await User.updateOne(
@@ -34,12 +34,12 @@ const addCart = async (req, res) => {
         (item) => item.productId === productId
       );
 
-      const getPrice = (currentQty, selectedProduct = product) => {
-        if (selectedProduct.price.length === 1) {
-          return selectedProduct.price[0];
+      const getPrice = (currentQty) => {
+        if (priceList.length === 1) {
+          return priceList[0];
         }
 
-        const rules = selectedProduct.price.reduce((a, b) => {
+        const rules = priceList.reduce((a, b) => {
           console.log("Current Qty");
 
           return Math.abs(b.minOrder - currentQty) <
@@ -51,7 +51,7 @@ const addCart = async (req, res) => {
         console.log("rules");
         console.log(rules);
 
-        const priceCheck = selectedProduct.price
+        const priceCheck = priceList
           .map((path, i, arr) => {
             if (path.minOrder === rules.minOrder) {
               if (rules.minOrder <= currentQty) {

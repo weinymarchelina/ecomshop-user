@@ -421,7 +421,11 @@ const Transactions = ({ user }) => {
                             <Button
                               size="small"
                               variant="contained"
-                              onClick={() => handleBuy(order)}
+                              onClick={(e) => {
+                                e.target.disabled = true;
+                                console.log(e.target.disabled);
+                                handleBuy(order);
+                              }}
                             >
                               Buy Again
                             </Button>

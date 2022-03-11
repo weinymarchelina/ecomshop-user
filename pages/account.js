@@ -211,8 +211,6 @@ const Settings = ({ user }) => {
               {topItems.length > 0 && (
                 <Box
                   sx={{
-                    borderBottom: 1,
-                    borderColor: "text.secondary",
                     px: 1,
                     pb: 1,
                     mb: 3,
@@ -279,7 +277,7 @@ const Settings = ({ user }) => {
                                     <Typography
                                       variant="body1"
                                       component="h2"
-                                      noWrap
+                                      noWrap={matches ? true : false}
                                       sx={{ width: "100%" }}
                                     >
                                       {product.name}
@@ -315,7 +313,7 @@ const Settings = ({ user }) => {
                                     my: 0.5,
                                   }}
                                 >
-                                  Buy
+                                  View
                                 </Button>
                               </CardContent>
                             </Card>

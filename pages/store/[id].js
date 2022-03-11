@@ -128,6 +128,8 @@ const DisplayProduct = ({ user }) => {
   };
 
   const handleCart = async () => {
+    console.log("dis product");
+    console.log(product);
     try {
       const result = await axios.post("/api/cart/add", {
         price,
@@ -147,6 +149,7 @@ const DisplayProduct = ({ user }) => {
       // console.log(expectedQty);
       setPrice(getPrice(expectedQty).price);
       setQuantity(1);
+      setProduct(product);
     } catch (err) {
       console.log(err.response.data.msg);
       console.log(err.response.data);
@@ -625,8 +628,10 @@ const DisplayProduct = ({ user }) => {
                                 <Button
                                   variant="outlined"
                                   sx={{ width: `${matches ? "100%" : "auto"}` }}
-                                  onClick={() => {
+                                  onClick={(e) => {
                                     if (!quantity) setQuantity(1);
+                                    e.target.disabled = true;
+                                    console.log(e.target.disabled);
                                     handleCheckout();
                                   }}
                                 >

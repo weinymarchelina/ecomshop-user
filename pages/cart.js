@@ -233,7 +233,11 @@ const CartItemList = ({ user }) => {
                 <Button
                   sx={{ mr: 0.5 }}
                   variant="outlined"
-                  onClick={handleSave}
+                  onClick={(e) => {
+                    e.target.disabled = true;
+                    console.log(e.target.disabled);
+                    handleSave();
+                  }}
                   size={stacks ? "small" : "large"}
                 >
                   Save
@@ -241,7 +245,11 @@ const CartItemList = ({ user }) => {
                 <Button
                   sx={{ ml: 0.5 }}
                   variant="contained"
-                  onClick={handleCheckout}
+                  onClick={(e) => {
+                    e.target.disabled = true;
+                    console.log(e.target.disabled);
+                    handleCheckout();
+                  }}
                   size={stacks ? "small" : "large"}
                   disabled={!selected.length > 0}
                 >

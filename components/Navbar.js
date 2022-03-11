@@ -1,9 +1,7 @@
-import MenuIcon from "@mui/icons-material/Menu";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useState } from "react";
 import {
   AppBar,
@@ -11,24 +9,14 @@ import {
   Container,
   Toolbar,
   IconButton,
-  Menu,
-  MenuItem,
   Button,
   Typography,
 } from "@mui/material";
 
-const links = [
-  "Store",
-  "Favorite",
-  "Cart",
-  "Transaction",
-  "Whatsapp",
-  "Account",
-];
+const links = ["Store", "Favorite", "Cart", "Transaction", "Account"];
 
 const Navbar = () => {
   const { data: session } = useSession();
-  useState(false);
   const router = useRouter();
 
   // const [anchorElNav, setAnchorElNav] = useState(null);
@@ -76,10 +64,12 @@ const Navbar = () => {
                 </IconButton>
                 <IconButton
                   size="large"
-                  onClick={() => router.push("/whatsapp")}
+                  // onClick={() => router.push("/whatsapp")}
                   color="inherit"
                 >
-                  <img src="/whatsapp-icon.svg" style={{ width: "22px" }} />
+                  <a href="https://wa.me/message/PHWP2UJ7Q6PKL1">
+                    <img src="/whatsapp-icon.svg" style={{ width: "22px" }} />
+                  </a>
                 </IconButton>
               </Box>
             )}
@@ -98,6 +88,13 @@ const Navbar = () => {
                   </Link>
                 </Typography>
               ))}
+              <Typography
+                variant="text"
+                sx={{ paddingLeft: 2, letterSpacing: "1px" }}
+                key="whatsapp"
+              >
+                <a href="https://wa.me/message/PHWP2UJ7Q6PKL1">WHATSAPP</a>
+              </Typography>
             </Box>
           )}
 
