@@ -146,7 +146,7 @@ const Checkout = ({ user }) => {
     const subtotal = selected.map((item) => item.price * item.quantity);
     const result = subtotal.reduce((partialSum, a) => partialSum + a, 0);
     //
-    const newDate = new Date();
+    const newDate = new Date().toISOString();
     const newOrder = {
       orderDate: newDate,
       doneStatus: false,
@@ -171,7 +171,7 @@ const Checkout = ({ user }) => {
       setClicked(true);
       setTimeout(() => {
         router.push("/transaction");
-      }, 3000);
+      }, 5000);
       // router.push("/transaction");
     } catch (err) {
       console.log(err.message);
@@ -489,12 +489,20 @@ const Checkout = ({ user }) => {
               Transaction Success
             </Typography>
             <Typography
-              sx={{ lineHeight: "125%", width: `${matches ? "auto" : "45ch"}` }}
+              sx={{ lineHeight: "125%" }}
               variant={matches ? "p" : "h6"}
               component="p"
               gutterBottom
             >
-              Redirecting you to your transaction list in 3 seconds...
+              Please communicate on Whatsapp for further information{" "}
+            </Typography>
+            <Typography
+              sx={{ lineHeight: "125%" }}
+              variant={matches ? "p" : "h6"}
+              component="p"
+              gutterBottom
+            >
+              Redirecting you to your transaction list in 5 seconds...
             </Typography>
             <img
               className="svg-login"

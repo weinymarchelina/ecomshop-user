@@ -6,6 +6,7 @@ import {
   BottomNavigation,
   BottomNavigationAction,
 } from "@mui/material";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import StorefrontIcon from "@mui/icons-material/Storefront";
@@ -18,6 +19,7 @@ const Layout = ({ children }) => {
   const [value, setValue] = useState(null);
   const matches = useMediaQuery("(max-width:900px)");
   const router = useRouter();
+  const { data: session } = useSession();
 
   useEffect(() => {
     if (router.route.includes("store")) {
@@ -55,7 +57,7 @@ const Layout = ({ children }) => {
       </Head>
       <Navbar />
       {children}
-      {matches && (
+      {session && matches && (
         <Paper
           sx={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 999 }}
           elevation={3}

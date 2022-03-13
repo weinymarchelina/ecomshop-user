@@ -149,7 +149,8 @@ const DisplayProduct = ({ user }) => {
       // console.log(expectedQty);
       setPrice(getPrice(expectedQty).price);
       setQuantity(1);
-      setProduct(product);
+      // setProduct(product);
+      setMax(product.stockQty - productCartQty[0].quantity);
     } catch (err) {
       console.log(err.response.data.msg);
       console.log(err.response.data);
@@ -475,9 +476,13 @@ const DisplayProduct = ({ user }) => {
                         {cartQty > 0 && product.stockQty > 0 && (
                           <Box>
                             <Typography variant="subtitle2" sx={{ mt: 1 }}>
-                              You have {cartQty} pcs in your cart. By adding{" "}
-                              {quantity} pcs, you will have {cartQty + quantity}{" "}
-                              pcs of this product.
+                              You have {cartQty} pcs in your cart.{" "}
+                              {max > 0
+                                ? `By adding
+                              ${quantity} pcs, you will have ${
+                                    cartQty + quantity
+                                  } pcs of this product.`
+                                : `This is the maximum quantity of this product.`}
                             </Typography>
                           </Box>
                         )}
@@ -619,6 +624,7 @@ const DisplayProduct = ({ user }) => {
                                     if (!quantity) setQuantity(1);
                                     handleCart();
                                   }}
+                                  disabled={max > 0 ? false : true}
                                 >
                                   <AddShoppingCartIcon
                                     sx={{ mr: 1, fontSize: 18 }}
