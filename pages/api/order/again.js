@@ -19,9 +19,6 @@ const getPrice = (currentQty, selectedProductPrice) => {
       : a;
   });
 
-  console.log("rules");
-  console.log(rules);
-
   const priceCheck = selectedProductPrice
     .map((path, i, arr) => {
       if (path.minOrder === rules.minOrder) {
@@ -52,14 +49,10 @@ const addCart = async (req, res) => {
       );
 
       if (sameProduct[0]) {
-        console.log(basketObj);
         basketObj.quantity = basketObj.quantity + sameProduct[0].quantity;
 
-        console.log(basketObj.priceList);
         const newPrice = getPrice(basketObj.quantity, basketObj.priceList);
         basketObj.price = newPrice.price;
-
-        console.log(basketObj);
 
         await User.updateOne(
           { _id: userId, "basket.productId": sameProduct[0].productId },
@@ -83,7 +76,6 @@ const addCart = async (req, res) => {
     }
 
     const newUpdatedUser = await User.findById(userId);
-    console.log(newUpdatedUser.basket);
 
     return res.status(200).json({
       result: newUpdatedUser,

@@ -32,12 +32,12 @@ const Settings = ({ user }) => {
     try {
       const res = await axios.get("/api/data/user");
       const { user, topItems } = res.data;
-      console.log(user);
-      console.log(topItems);
+
       setUserInfo(user);
       setTopItems(topItems);
     } catch (err) {
       console.log(err.message);
+      console.log(err.response?.data);
       throw new Error(err.message);
     }
   }, []);
@@ -226,7 +226,6 @@ const Settings = ({ user }) => {
                         return (
                           <Box
                             sx={{
-                              cursor: "pointer",
                               width: "100%",
                             }}
                             key={product._id}

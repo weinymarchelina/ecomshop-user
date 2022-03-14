@@ -9,7 +9,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  TextField,
 } from "@mui/material";
 import axios from "axios";
 import { useState, useEffect } from "react";
@@ -27,20 +26,25 @@ const formatter = new Intl.NumberFormat("id", {
   minimumFractionDigits: 0,
 });
 
+const startDayWeek = moment(new Date()).startOf("week").format("MMM Do");
+const lastDayWeek = moment(new Date()).endOf("week").format("MMM Do");
+const startDayMonth = moment(new Date()).startOf("month").format("MMM Do");
+const lastDayMonth = moment(new Date()).endOf("month").format("MMM Do");
+const today = moment(new Date()).format("MMM Do");
+
 const Transactions = ({ user }) => {
   const matches = useMediaQuery("(max-width:720px)");
   const stacks = useMediaQuery("(max-width:560px)");
   const [orders, setOrders] = useState([]);
   const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("All");
   const filterList = [
     "Unfinished",
     "Finished",
     "Canceled",
-    "Today",
-    "This Week",
-    "This Month",
+    `Today (${today})`,
+    `This Week (${startDayWeek} - ${lastDayWeek})`,
+    `This Month (${startDayMonth} - ${lastDayMonth})`,
   ];
 
   useEffect(async () => {
@@ -64,11 +68,10 @@ const Transactions = ({ user }) => {
         }
       }
 
-      console.log(orderData);
-
       setOrders(orderData);
     } catch (err) {
       console.log(err.message);
+      console.log(err.response?.data);
       throw new Error(err.message);
     }
   }, []);
@@ -93,10 +96,9 @@ const Transactions = ({ user }) => {
           filteredOrders = orders.filter(
             (order) => order.doneStatus && order.finishDate === "-"
           );
-          console.log(filteredOrders);
           break;
 
-        case "Today":
+        case `Today (${today})`:
           filteredOrders = orders.filter(
             (order) =>
               moment(new Date(order.createdAt)).format("LL") ===
@@ -105,7 +107,7 @@ const Transactions = ({ user }) => {
 
           break;
 
-        case "This Week":
+        case `This Week (${startDayWeek} - ${lastDayWeek})`:
           filteredOrders = orders.filter((order) => {
             const startDayOfPrevWeek = moment(new Date())
               .startOf("week")
@@ -124,7 +126,7 @@ const Transactions = ({ user }) => {
 
           break;
 
-        case "This Month":
+        case `This Month (${startDayMonth} - ${lastDayMonth})`:
           filteredOrders = orders.filter((order) => {
             const startDayOfMonth = moment(new Date())
               .startOf("month")
@@ -184,13 +186,11 @@ const Transactions = ({ user }) => {
   };
 
   const handleBuy = async (order) => {
-    console.log(order.itemList);
     try {
       const res = await axios.post("/api/order/again", {
         items: order.itemList,
       });
 
-      console.log(res);
       router.push("/cart");
     } catch (err) {
       console.log(err.message);
@@ -305,9 +305,6 @@ const Transactions = ({ user }) => {
                                     stacks ? "3.75rem" : "calc(5rem + 1vw)"
                                   }`,
                                   margin: "0 .5rem",
-                                  // opacity: `${
-                                  //   order.firstItem.stockQty === 0 ? 0.7 : 1
-                                  // }`,
                                 }}
                               />
                             </Box>
@@ -377,7 +374,6 @@ const Transactions = ({ user }) => {
                                   px: 1,
                                   py: 0.5,
                                   borderRadius: "0.35vw",
-                                  // backgroundColor: getColor(order),
                                 }}
                                 style={getStyle(order)}
                               >
@@ -402,7 +398,6 @@ const Transactions = ({ user }) => {
                         </Box>
 
                         <Box
-                          // className="f-space"
                           sx={{
                             mt: 3,
                             display: "flex",
@@ -423,7 +418,6 @@ const Transactions = ({ user }) => {
                               variant="contained"
                               onClick={(e) => {
                                 e.target.disabled = true;
-                                console.log(e.target.disabled);
                                 handleBuy(order);
                               }}
                             >
@@ -462,33 +456,3 @@ export async function getServerSideProps(context) {
     props: { user: session.user },
   };
 }
-
-// for (const order of orderData) {
-//   const firstProduct = productData.filter(
-//     (product) => product._id === order.itemList[0].productId
-//   );
-//   order.firstItemInfo = order.itemList[0];
-//   order.firstItem = firstProduct[0];
-//   order.productQty = order.itemList.length;
-
-//   for (const item of order.itemList) {
-//     const product = productData.filter(
-//       (product) => product._id === item.productId
-//     );
-
-//     const productNames = [];
-//     productData.forEach((product) => {
-//       if (
-//         item.productId === product._id &&
-//         !products.includes(product._id)
-//       ) {
-//         productNames.push(product.name);
-//       }
-//     });
-
-//     console.log(productNames);
-//     setProducts((prev) => [...prev, productNames]);
-
-//     item.priceList = product[0].price;
-//   }
-// }

@@ -38,11 +38,6 @@ const getUser = async (req, res) => {
         }
       }
 
-      // product.buyedQty = buyedQty;
-      // product.amount = amount;
-      console.log(`${product.name}: ${buyedQty}`);
-      console.log(`${product.name}: ${amount}`);
-
       return {
         productId: product._id,
         name: product.name,
@@ -52,7 +47,6 @@ const getUser = async (req, res) => {
         amount,
       };
     });
-    console.log(favItems);
     favItems.sort((a, b) => b.buyedQty - a.buyedQty);
     const topItems = favItems
       .filter((product) => product.buyedQty > 0)
@@ -63,7 +57,6 @@ const getUser = async (req, res) => {
       topItems,
     });
   } catch (err) {
-    console.log(err.message);
     return res.status(500).json(err.message);
   }
 };

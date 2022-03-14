@@ -60,18 +60,15 @@ const Product = ({ user }) => {
   useEffect(async () => {
     try {
       const res = await axios.get("/api/products/");
-      // console.log(res.data);
       const { productData, businessCategory, userFavList } = res.data;
 
       setCategoryList(businessCategory);
 
       setProducts(productData);
       setFavItemList(userFavList);
-      console.log(userFavList);
     } catch (err) {
       console.log(err.message);
       console.log(err.response?.data);
-
       throw new Error(err.message);
     }
   }, []);
@@ -148,7 +145,6 @@ const Product = ({ user }) => {
 
   const favoriteStatus = (selectedProduct) => {
     const getStatus = favItemList.filter((item) => {
-      // console.log(`${selectedProduct.name}: ${item === selectedProduct._id}`);
       return item === selectedProduct._id;
     });
 
@@ -161,10 +157,8 @@ const Product = ({ user }) => {
 
   const handleFavorite = async (e, selectedProduct) => {
     e.stopPropagation();
-    // console.log(favItemList);
 
     const checkResult = favoriteStatus(selectedProduct);
-    // console.log(checkResult);
 
     try {
       await axios.post("/api/products/favorite", {
@@ -180,7 +174,9 @@ const Product = ({ user }) => {
         setFavItemList((prevList) => [...prevList, selectedProduct._id]);
       }
     } catch (err) {
-      console.log(err.response.data.msg);
+      console.log(err.message);
+      console.log(err.response?.data);
+      throw new Error(err.message);
       return;
     }
   };

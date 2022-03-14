@@ -55,6 +55,7 @@ const FavoriteItemList = ({ user }) => {
       setProducts(favProducts);
     } catch (err) {
       console.log(err.message);
+      console.log(err.response?.data);
       throw new Error(err.message);
     }
   }, []);
@@ -80,13 +81,11 @@ const FavoriteItemList = ({ user }) => {
         const textB = b.toUpperCase();
         return textA < textB ? -1 : textA > textB ? 1 : 0;
       });
-      console.log(newFavList);
-      const res = await axios.post("/api/products/favorite", {
+      await axios.post("/api/products/favorite", {
         productId: newFavList,
         favorite: "Update",
       });
 
-      console.log(res);
       router.push("/store");
     } catch (err) {
       console.log(err.message);
@@ -128,7 +127,6 @@ const FavoriteItemList = ({ user }) => {
                   variant="contained"
                   onClick={(e) => {
                     e.target.disabled = true;
-                    console.log(e.target.disabled);
                     handleSave();
                   }}
                 >

@@ -117,10 +117,6 @@ img {
   }
 }
 
-@media only screen and (max-width: 720px) {
-  /**/
-}
-
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;

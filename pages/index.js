@@ -36,7 +36,7 @@ export default function Home({ user }) {
               component="h1"
               gutterBottom
             >
-              Welcome User
+              Login Page
             </Typography>
 
             <Typography
@@ -44,7 +44,7 @@ export default function Home({ user }) {
               variant={matches ? "p" : "h6"}
               component="p"
               gutterBottom
-            >{`Welcome new user, let's login to the Super One Accessories's Online Shop!`}</Typography>
+            >{`Login to the Super One Accessories's Online Shop!`}</Typography>
 
             <img
               className="svg-login"
@@ -56,20 +56,10 @@ export default function Home({ user }) {
               className={matches ? "f-column" : "f-row"}
               sx={{ width: `${matches ? "100%" : "auto"}` }}
             >
-              {/* <Button
-                variant="contained"
-                size={matches ? "small" : "large"}
-                sx={{ width: `${matches ? "100%" : "auto"}` }}
-                style={{ marginRight: `${matches ? "0" : ".5rem"}` }}
-              >
-                <Link href="/signup">Sign Up</Link>
-              </Button> */}
-
               <Button
                 variant="contained"
                 size={matches ? "small" : "large"}
                 sx={{ width: `${matches ? "100%" : "auto"}` }}
-                // style={{ marginLeft: `${matches ? "0" : ".5rem"}` }}
                 onClick={() => {
                   signIn(null, {
                     callbackUrl: `${window.location.origin}/store`,

@@ -40,7 +40,6 @@ const Checkout = ({ user }) => {
   const router = useRouter();
 
   useEffect(async () => {
-    // console.log(user);
     if (!window.localStorage.selected) {
       router.push("/store");
       return;
@@ -49,32 +48,27 @@ const Checkout = ({ user }) => {
     const prevPath = window.localStorage.prevpath;
     setPrevPath(prevPath);
 
-    console.log(selectedItems);
     const findCartInfo = (product) => {
       const findInfo = selectedItems.filter((obj) => {
         return obj.productId === product._id;
       });
-      console.log(findInfo);
       return findInfo[0];
     };
 
     try {
       const res = await axios.get("/api/products/");
       const { productData } = res.data;
-      console.log(productData);
 
       const selectedProducts = selectedItems.map((obj) => {
         const result = productData.filter((item) => obj.productId === item._id);
         return result[0];
       });
-      console.log(selectedProducts);
 
       const inactiveItems = selectedProducts.filter((product) => {
         return product.stockQty < findCartInfo(product)?.quantity;
       });
 
       if (inactiveItems[0]) {
-        console.log("AYYYYY");
         try {
           const res = await axios.post("/api/products/update", {
             inactiveItems,
@@ -83,7 +77,6 @@ const Checkout = ({ user }) => {
           if (typeof window !== "undefined") {
             localStorage.clear();
           }
-          console.log(res.data.empty);
           if (!res.data.empty) {
             router.push("/cart");
           }
@@ -98,11 +91,9 @@ const Checkout = ({ user }) => {
           getSelectedTotal(newSelected);
         } catch (err) {
           console.log(err.message);
-          console.log(err.response.data);
+          console.log(err.response?.data);
           throw new Error(err.message);
         }
-
-        // router.push("/cart");
       } else {
         setSelected(selectedItems);
         getSelectedTotal(selectedItems);
@@ -111,7 +102,7 @@ const Checkout = ({ user }) => {
       setProducts(selectedProducts);
     } catch (err) {
       console.log(err.message);
-
+      console.log(err.response?.data);
       throw new Error(err.message);
     }
   }, []);
@@ -119,7 +110,6 @@ const Checkout = ({ user }) => {
   const handleOrder = async () => {
     try {
       const res = await axios.get("/api/products/");
-      console.log(res.data);
       const { productData } = res.data;
       const selectedProducts = selected.map((obj) => {
         const result = productData.filter((item) => obj.productId === item._id);
@@ -129,23 +119,19 @@ const Checkout = ({ user }) => {
       const inactiveItems = selectedProducts.filter((product) => {
         return product.stockQty < findCartInfo(product)?.quantity;
       });
-      console.log(inactiveItems);
 
       if (inactiveItems[0]) {
-        console.log("HAYO");
         window.location.reload();
         return;
       }
     } catch (err) {
       console.log(err.message);
-      console.log(err.response.data);
+      console.log(err.response?.data);
       throw new Error(err.message);
     }
 
-    //
     const subtotal = selected.map((item) => item.price * item.quantity);
     const result = subtotal.reduce((partialSum, a) => partialSum + a, 0);
-    //
     const newDate = new Date().toISOString();
     const newOrder = {
       orderDate: newDate,
@@ -160,11 +146,10 @@ const Checkout = ({ user }) => {
     };
 
     try {
-      const res = await axios.post("/api/order/add", {
+      await axios.post("/api/order/add", {
         newOrder,
         prevPath,
       });
-      console.log(res);
       if (typeof window !== "undefined") {
         localStorage.clear();
       }
@@ -172,10 +157,9 @@ const Checkout = ({ user }) => {
       setTimeout(() => {
         router.push("/transaction");
       }, 5000);
-      // router.push("/transaction");
     } catch (err) {
       console.log(err.message);
-      console.log(err.response.data);
+      console.log(err.response?.data);
       throw new Error(err.message);
     }
   };
@@ -256,7 +240,6 @@ const Checkout = ({ user }) => {
                   variant="contained"
                   onClick={(e) => {
                     e.target.disabled = true;
-                    console.log(e.target.disabled);
                     handleOrder();
                   }}
                   size={stacks ? "small" : "large"}

@@ -26,7 +26,6 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 const DisplayProduct = ({ user }) => {
   const router = useRouter();
   const { id } = router.query;
-  // console.log(id);
 
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
@@ -65,18 +64,11 @@ const DisplayProduct = ({ user }) => {
     }
 
     const rules = selectedProduct.price.reduce((a, b) => {
-      console.log("Current Qty");
-      console.log(currentQty);
-      console.log(a.minOrder);
-      console.log(b.minOrder);
       return Math.abs(b.minOrder - currentQty) <
         Math.abs(a.minOrder - currentQty)
         ? b
         : a;
     });
-
-    console.log("rules");
-    console.log(rules);
 
     const priceCheck = selectedProduct.price
       .map((path, i, arr) => {
@@ -119,7 +111,6 @@ const DisplayProduct = ({ user }) => {
     while (counter < currentItemCount) {
       const nextProduct =
         allItems[getIndex(allItems, counter, selectedProduct)];
-      // console.log(nextProduct);
       arrProducts.push(nextProduct);
       counter++;
     }
@@ -128,8 +119,6 @@ const DisplayProduct = ({ user }) => {
   };
 
   const handleCart = async () => {
-    console.log("dis product");
-    console.log(product);
     try {
       const result = await axios.post("/api/cart/add", {
         price,
@@ -140,16 +129,12 @@ const DisplayProduct = ({ user }) => {
       });
 
       const { basket } = result.data.result;
-      // console.log(basket);
       const productCartQty = basket.filter((item) => item.productId === id);
-      // console.log(productCartQty);
       setCartQty(productCartQty[0].quantity);
 
       const expectedQty = 1 + productCartQty[0].quantity;
-      // console.log(expectedQty);
       setPrice(getPrice(expectedQty).price);
       setQuantity(1);
-      // setProduct(product);
       setMax(product.stockQty - productCartQty[0].quantity);
     } catch (err) {
       console.log(err.response.data.msg);
@@ -186,10 +171,7 @@ const DisplayProduct = ({ user }) => {
       const { productData, userBasket } = res.data;
       const searched = productData.filter((product) => product._id === id);
       const mainProduct = searched[0];
-      console.log(mainProduct);
-      console.log(mainProduct.price);
 
-      // console.log(userBasket);
       const productCartQty = userBasket.filter((item) => item.productId === id);
 
       const currentCartQty = productCartQty[0] ? productCartQty[0].quantity : 0;
@@ -210,6 +192,7 @@ const DisplayProduct = ({ user }) => {
         });
       setNextProducts(getNextProducts(allActive, mainProduct));
     } catch (err) {
+      console.log(err.response.data.msg);
       console.log(err.response?.data);
       throw new Error(err.message);
     }
@@ -404,7 +387,6 @@ const DisplayProduct = ({ user }) => {
                       </Box>
 
                       <Box
-                        // className="f-row"
                         sx={{
                           display: "flex",
                           alignItems: "flex-start",
@@ -592,7 +574,6 @@ const DisplayProduct = ({ user }) => {
                                       quantity + 1 > max ? value : value + 1
                                     );
 
-                                    console.log(cartQty);
                                     if (quantity + 1 >= 1) {
                                       setPrice(
                                         getPrice(quantity + 1 + cartQty).price
@@ -637,7 +618,6 @@ const DisplayProduct = ({ user }) => {
                                   onClick={(e) => {
                                     if (!quantity) setQuantity(1);
                                     e.target.disabled = true;
-                                    console.log(e.target.disabled);
                                     handleCheckout();
                                   }}
                                 >

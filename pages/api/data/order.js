@@ -24,8 +24,6 @@ const getOrder = async (req, res) => {
       businessId,
     });
 
-    console.log(order);
-
     res.status(200).json({
       orderData: order,
       productData: product.filter((product) => product.activeStatus),

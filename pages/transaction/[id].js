@@ -1,18 +1,4 @@
-import {
-  Box,
-  Card,
-  CardContent,
-  Container,
-  Typography,
-  IconButton,
-  TextField,
-  Button,
-  Checkbox,
-  FormControl,
-  Input,
-  Select,
-  MenuItem,
-} from "@mui/material";
+import { Box, Card, CardContent, Container, Typography } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -26,7 +12,6 @@ import moment from "moment";
 const DisplayOrder = ({ user }) => {
   const router = useRouter();
   const { id } = router.query;
-  // console.log(id);
 
   const [order, setOrder] = useState(null);
   const [products, setProducts] = useState([]);
@@ -54,12 +39,11 @@ const DisplayOrder = ({ user }) => {
         productObj.orderedPrice = item.price;
         return productObj;
       });
-      console.log(orderedProductList);
       setProducts(orderedProductList);
 
-      console.log(orderData);
       setOrder(orderData);
     } catch (err) {
+      console.log(err.message);
       console.log(err.response?.data);
       throw new Error(err.message);
     }
@@ -151,7 +135,6 @@ const DisplayOrder = ({ user }) => {
                     px: 1,
                     py: 0.5,
                     borderRadius: "0.35vw",
-                    // backgroundColor: getColor(order),
                   }}
                   style={getStyle(order)}
                 >

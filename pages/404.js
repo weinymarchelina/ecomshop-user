@@ -1,11 +1,4 @@
-import {
-  Button,
-  Box,
-  Card,
-  CardContent,
-  Container,
-  Typography,
-} from "@mui/material";
+import { Card, CardContent, Container, Typography } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useRouter } from "next/router";
 import { useEffect } from "react";

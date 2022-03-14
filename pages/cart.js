@@ -28,7 +28,6 @@ const CartItemList = ({ user }) => {
   const switchNav = useMediaQuery("(max-width:900px)");
   const matches = useMediaQuery("(max-width:720px)");
   const stacks = useMediaQuery("(max-width:560px)");
-  // const [checkAll, setCheckAll] = useState(false);
   const [products, setProducts] = useState([]);
   const [basket, setBasket] = useState([]);
   const [selected, setSelected] = useState([]);
@@ -43,18 +42,11 @@ const CartItemList = ({ user }) => {
     }
 
     const rules = selectedProduct.price.reduce((a, b) => {
-      console.log("Current Qty");
-      console.log(currentQty);
-      console.log(a.minOrder);
-      console.log(b.minOrder);
       return Math.abs(b.minOrder - currentQty) <
         Math.abs(a.minOrder - currentQty)
         ? b
         : a;
     });
-
-    console.log("rules");
-    console.log(rules);
 
     const priceCheck = selectedProduct.price
       .map((path, i, arr) => {
@@ -81,7 +73,6 @@ const CartItemList = ({ user }) => {
     const subtotal = arr.map((item) => item.price * item.quantity);
     const result = subtotal.reduce((partialSum, a) => partialSum + a, 0);
     setSubtotal(formatter.format(result));
-    // return formatter.format(result);
   };
 
   useEffect(async () => {
@@ -102,7 +93,6 @@ const CartItemList = ({ user }) => {
       setProducts(sortedProducts);
     } catch (err) {
       console.log(err.message);
-
       console.log(err.response?.data);
       throw new Error(err.message);
     }
@@ -133,12 +123,11 @@ const CartItemList = ({ user }) => {
     setBasket(noNull);
 
     try {
-      const res = await axios.post("/api/cart/add", {
+      await axios.post("/api/cart/add", {
         basket: noNull,
         added: "Update",
       });
 
-      console.log(res);
       router.push("/store");
     } catch (err) {
       console.log(err.message);
@@ -163,8 +152,6 @@ const CartItemList = ({ user }) => {
         added: "Update",
       });
 
-      console.log(res);
-      console.log(selected);
       if (typeof window !== "undefined") {
         localStorage.setItem("selected", JSON.stringify(selected));
         localStorage.setItem("prevpath", "cart");
@@ -235,7 +222,6 @@ const CartItemList = ({ user }) => {
                   variant="outlined"
                   onClick={(e) => {
                     e.target.disabled = true;
-                    console.log(e.target.disabled);
                     handleSave();
                   }}
                   size={stacks ? "small" : "large"}
@@ -247,7 +233,6 @@ const CartItemList = ({ user }) => {
                   variant="contained"
                   onClick={(e) => {
                     e.target.disabled = true;
-                    console.log(e.target.disabled);
                     handleCheckout();
                   }}
                   size={stacks ? "small" : "large"}
@@ -328,11 +313,7 @@ const CartItemList = ({ user }) => {
                               onChange={(e) => {
                                 if (e.target.checked) {
                                   const thisProductObj = findCartInfo(product);
-                                  // setSelected((prevObjs) => [
-                                  //   ...prevObjs,
-                                  //   thisProductObj,
-                                  // ]);
-                                  console.log([...selected, thisProductObj]);
+
                                   setSelected([...selected, thisProductObj]);
                                   getSelectedTotal([
                                     ...selected,
@@ -390,11 +371,6 @@ const CartItemList = ({ user }) => {
                               sx={{ display: "flex", alignItems: "flex-end" }}
                             >
                               <Typography component="p" fontWeight={"bold"}>
-                                {/* //! handle this into conditional to displayprice */}
-                                {/* {findCartInfo(product).quantity >
-                                    product.stockQty
-                                      ? product.stockQty
-                                      : findCartInfo(product).quantity} */}
                                 {product.stockQty > 0
                                   ? formatter.format(
                                       findCartInfo(product).price
@@ -407,7 +383,6 @@ const CartItemList = ({ user }) => {
                                   <Typography
                                     sx={{
                                       ml: 1,
-                                      // mb: 0.25,
                                       textDecoration: "line-through",
                                     }}
                                     variant="caption"
@@ -582,8 +557,6 @@ const CartItemList = ({ user }) => {
                                     );
                                     setBasket(updatedBasket);
 
-                                    console.log(newObj);
-
                                     const thisProduct = selected.filter(
                                       (item) => item.productId === product._id
                                     );
@@ -717,145 +690,4 @@ export async function getServerSideProps(context) {
   return {
     props: { user: session.user },
   };
-}
-
-{
-  /* <span
-                                  className="buttonAdd f-row"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-
-                                    const newObj = {};
-                                    const updatedBasket = basket.map(
-                                      (infoObj) => {
-                                        if (infoObj.productId === product._id) {
-                                          const { quantity: currentQty } =
-                                            infoObj;
-
-                                          newObj.productId = infoObj.productId;
-
-                                          newObj.quantity =
-                                            currentQty - 1 === 0
-                                              ? 1
-                                              : currentQty - 1;
-
-                                          newObj.price = getPrice(
-                                            currentQty - 1,
-                                            product
-                                          ).price;
-
-                                          return newObj;
-                                        }
-
-                                        return infoObj;
-                                      }
-                                    );
-                                    setBasket(updatedBasket);
-
-                                    // console.log(newObj);
-
-                                    const otherItems = selected.filter(
-                                      (selectedItem) =>
-                                        selectedItem.productId !== product._id
-                                    );
-                                    // console.log(otherItems);
-
-                                    if (otherItems.length !== selected.length) {
-                                      getSelectedTotal([...otherItems, newObj]);
-                                    }
-                                  }}
-                                >
-                                  <RemoveIcon fontSize="small" />
-                                </span>
-                                <TextField
-                                  inputProps={{
-                                    min,
-                                    max,
-                                    style: {
-                                      textAlign: "center",
-                                      padding: "0.55rem 0",
-                                      letterSpacing: "1px",
-                                    },
-                                  }}
-                                  type="number"
-                                  size="small"
-                                  value={findCartInfo(product).quantity}
-                                  onClick={(e) => e.stopPropagation()}
-                                  onChange={(e) => {
-                                    let value = parseInt(e.target.value, 10);
-                                    const max = product.stockQty;
-
-                                    if (value > max) value = max;
-                                    if (value < min) value = min;
-
-                                    const updatedBasket = basket.map(
-                                      (infoObj) => {
-                                        if (infoObj.productId === product._id) {
-                                          return {
-                                            productId: infoObj.productId,
-                                            quantity: value,
-                                            price:
-                                              value >= 1
-                                                ? getPrice(value, product).price
-                                                : infoObj.price,
-                                          };
-                                        }
-
-                                        return infoObj;
-                                      }
-                                    );
-                                    setBasket(updatedBasket);
-                                  }}
-                                  required
-                                  sx={{
-                                    mx: 0,
-                                    p: 0,
-                                    width: "3.75rem",
-                                  }}
-                                />
-                                <span
-                                  className="buttonAdd  f-row"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    const max = product.stockQty;
-
-                                    const newObj = {};
-                                    const updatedBasket = basket.map(
-                                      (infoObj) => {
-                                        if (infoObj.productId === product._id) {
-                                          const { quantity: currentQty } =
-                                            infoObj;
-
-                                          newObj.productId = infoObj.productId;
-
-                                          newObj.quantity =
-                                            currentQty + 1 > max
-                                              ? currentQty
-                                              : currentQty + 1;
-
-                                          newObj.price = getPrice(
-                                            currentQty + 1,
-                                            product
-                                          ).price;
-
-                                          return newObj;
-                                        }
-
-                                        return infoObj;
-                                      }
-                                    );
-                                    setBasket(updatedBasket);
-                                    const otherItems = selected.filter(
-                                      (selectedItem) =>
-                                        selectedItem.productId !== product._id
-                                    );
-                                    // console.log(otherItems);
-
-                                    if (otherItems.length !== selected.length) {
-                                      getSelectedTotal([...otherItems, newObj]);
-                                    }
-                                  }}
-                                >
-                                  <AddIcon fontSize="small" />
-                                </span> */
 }

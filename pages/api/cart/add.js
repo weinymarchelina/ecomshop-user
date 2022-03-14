@@ -40,16 +40,11 @@ const addCart = async (req, res) => {
         }
 
         const rules = priceList.reduce((a, b) => {
-          console.log("Current Qty");
-
           return Math.abs(b.minOrder - currentQty) <
             Math.abs(a.minOrder - currentQty)
             ? b
             : a;
         });
-
-        console.log("rules");
-        console.log(rules);
 
         const priceCheck = priceList
           .map((path, i, arr) => {
@@ -73,8 +68,6 @@ const addCart = async (req, res) => {
         const newPrice = getPrice(basketObj.quantity);
         basketObj.price = newPrice.price;
 
-        console.log(basketObj);
-
         await User.updateOne(
           { _id: userId, "basket.productId": productId },
           {
@@ -97,7 +90,6 @@ const addCart = async (req, res) => {
     }
 
     const newUpdatedUser = await User.findById(userId);
-    console.log(newUpdatedUser.basket);
 
     return res.status(200).json({
       result: newUpdatedUser,

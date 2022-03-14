@@ -2,7 +2,6 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { signIn, useSession } from "next-auth/react";
-import { useState } from "react";
 import {
   AppBar,
   Box,
@@ -19,16 +18,6 @@ const Navbar = () => {
   const { data: session } = useSession();
   const router = useRouter();
 
-  // const [anchorElNav, setAnchorElNav] = useState(null);
-
-  // const handleOpenNavMenu = (event) => {
-  //   setAnchorElNav(event.currentTarget);
-  // };
-
-  // const handleCloseNavMenu = () => {
-  //   setAnchorElNav(null);
-  // };
-
   return (
     <AppBar
       className="nav-container"
@@ -37,22 +26,37 @@ const Navbar = () => {
       style={{ position: "fixed" }}
     >
       <Container maxWidth="xxl">
-        <Toolbar disableGutters>
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            LOGO
+        <Toolbar className="f-space" disableGutters>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "flex-end",
+              width: { xs: "30px" },
+              cursor: "pointer",
+              "&:hover": {
+                opacity: 0.85,
+              },
+            }}
+            onClick={() => router.push("/order")}
+          >
+            <img style={{ width: "100%" }} src="/icon.png" />
+            <Typography
+              sx={{
+                letterSpacing: "1.25px",
+                display: { xs: "none", sm: "block" },
+                ml: 1,
+              }}
+            >
+              ECOMSHOP
+            </Typography>
           </Box>
 
           <Box
             sx={{
-              flexGrow: 1,
               display: { xs: "flex", md: "none" },
               alignItems: "center",
             }}
           >
-            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-              LOGO
-            </Box>
-
             {session && (
               <Box>
                 <IconButton
@@ -62,11 +66,7 @@ const Navbar = () => {
                 >
                   <ShoppingCartIcon />
                 </IconButton>
-                <IconButton
-                  size="large"
-                  // onClick={() => router.push("/whatsapp")}
-                  color="inherit"
-                >
+                <IconButton size="large" color="inherit">
                   <a href="https://wa.me/message/PHWP2UJ7Q6PKL1">
                     <img src="/whatsapp-icon.svg" style={{ width: "22px" }} />
                   </a>
@@ -99,8 +99,8 @@ const Navbar = () => {
           )}
 
           {!session && (
-            <>
-              <Button
+            <Box sx={{ display: "flex", gap: 1 }}>
+              {/* <Button
                 onClick={() => {
                   signIn(null, {
                     callbackUrl: `${window.location.origin}/store`,
@@ -111,8 +111,11 @@ const Navbar = () => {
                 sx={{ ml: 2 }}
               >
                 Login
+              </Button> */}
+              <Button variant="outlined" color="secondary">
+                <a href="https://wa.me/message/PHWP2UJ7Q6PKL1">WHATSAPP</a>
               </Button>
-            </>
+            </Box>
           )}
         </Toolbar>
       </Container>

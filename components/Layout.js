@@ -1,11 +1,6 @@
 import Navbar from "./Navbar";
 import Head from "next/head";
-import {
-  Box,
-  Paper,
-  BottomNavigation,
-  BottomNavigationAction,
-} from "@mui/material";
+import { Paper, BottomNavigation, BottomNavigationAction } from "@mui/material";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -31,21 +26,6 @@ const Layout = ({ children }) => {
     } else if (router.route.includes("account")) {
       setValue(3);
     }
-    // switch (router.route) {
-    //   case router.route.includes("favorite"):
-    //     setValue(1);
-    //     break;
-    //   case router.route.includes("transaction"):
-    //     setValue(2);
-    //     break;
-    //   case router.route.includes("account"):
-    //     setValue(3);
-    //     break;
-
-    //   default:
-    //     setValue(0);
-    //     break;
-    // }
   }, []);
 
   return (

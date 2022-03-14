@@ -12,16 +12,12 @@ const getPrice = (currentQty, selectedProduct = product, empty) => {
   if (selectedProduct.price.length === 1) {
     return selectedProduct.price[0];
   }
-  console.log(currentQty);
-  console.log(selectedProduct);
 
   const rules = selectedProduct.price.reduce((a, b) => {
     return Math.abs(b.minOrder - currentQty) < Math.abs(a.minOrder - currentQty)
       ? b
       : a;
   });
-  console.log("de rules");
-  console.log(rules);
 
   const priceCheck = selectedProduct.price
     .map((path, i, arr) => {
@@ -33,13 +29,11 @@ const getPrice = (currentQty, selectedProduct = product, empty) => {
           return arr[prevPath];
         }
       } else {
-        console.log("Hey");
         empty = true;
         return rules;
       }
     })
     .find((obj) => obj);
-  console.log(priceCheck);
 
   return priceCheck;
 };
@@ -52,8 +46,6 @@ const updateCart = async (req, res) => {
     const { inactiveItems } = req.body;
 
     const user = await User.findById(userId);
-    console.log(inactiveItems);
-    console.log(user.basket);
 
     let empty = false;
 
@@ -67,7 +59,6 @@ const updateCart = async (req, res) => {
 
       return obj;
     });
-    console.log(updatedBasket);
 
     await User.updateOne(
       { _id: userId },
@@ -76,7 +67,6 @@ const updateCart = async (req, res) => {
       }
     );
 
-    console.log(empty);
     return res.status(200).json({
       newSelected: updatedBasket,
       empty,

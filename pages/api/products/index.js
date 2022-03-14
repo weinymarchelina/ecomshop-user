@@ -41,15 +41,12 @@ const getProduct = async (req, res) => {
     });
 
     if (fixError) {
-      console.log("Fixing");
-      console.log(checkBasket);
       await User.updateOne(
         { _id: userId },
         {
           basket: checkBasket,
         }
       );
-      console.log("fixed");
     }
 
     res.status(200).json({
