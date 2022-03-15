@@ -44,7 +44,7 @@ export default function Home({ user }) {
               variant={matches ? "p" : "h6"}
               component="p"
               gutterBottom
-            >{`Login to the Super One Accessories's Online Shop!`}</Typography>
+            >{`Login to Ecomshop!`}</Typography>
 
             <img
               className="svg-login"

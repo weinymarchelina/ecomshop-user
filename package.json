@@ -1,5 +1,5 @@
 {
-  "name": "superone-user",
+  "name": "ecomshop-user",
   "private": true,
   "scripts": {
     "dev": "next dev",
