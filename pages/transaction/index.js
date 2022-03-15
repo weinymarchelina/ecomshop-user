@@ -203,8 +203,7 @@ const Transactions = ({ user }) => {
     <Container
       sx={{
         pt: 12,
-        pb: 5,
-        minHeight: "120vh",
+        pb: 10,
       }}
       maxWidth="lg"
     >

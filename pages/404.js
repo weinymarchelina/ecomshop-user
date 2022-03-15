@@ -17,7 +17,7 @@ export default function NotFound() {
       className="flex-row "
       sx={{
         pt: 12,
-        pb: 5,
+        pb: 10,
       }}
       maxWidth={"md"}
     >

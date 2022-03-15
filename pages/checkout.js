@@ -186,7 +186,11 @@ const Checkout = ({ user }) => {
       sx={{
         pt: 12,
         pb: 5,
-        minHeight: "120vh",
+        minHeight: `${
+          stacks
+            ? `calc(12.5rem * ${products.length + 1})`
+            : `calc(15rem * ${products.length + 1})`
+        }`,
       }}
       maxWidth="lg"
     >
